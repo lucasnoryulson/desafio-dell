@@ -1,0 +1,109 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Startup {
+  id        String   @id @default(uuid())
+  name      String
+  slogan    String
+  description String?
+  foundingYear Int
+  score     Float    @default(70)
+  
+  // Stats
+  pitches   Int     @default(0)
+  bugs      Int     @default(0)
+  tractions Int     @default(0)
+  angryInvestors Int @default(0)
+  fakeNews  Int     @default(0)
+
+  // Participations in tournaments
+  participations TournamentParticipation[]
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Tournament {
+  id        String   @id @default(uuid())
+  startDate DateTime @default(now())
+  endDate   DateTime?
+  isCompleted Boolean @default(false)
+  
+  // Relationships
+  participations TournamentParticipation[]
+  battles Battle[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model TournamentParticipation {
+  id          String   @id @default(uuid())
+  tournament  Tournament @relation(fields: [tournamentId], references: [id])
+  tournamentId String
+  startup     Startup    @relation(fields: [startupId], references: [id])
+  startupId   String
+  finalPosition Int?
+  finalScore   Float?
+  
+  // Estatísticas finais da participação
+  finalPitches Int @default(0)
+  finalBugs Int @default(0)
+  finalTractions Int @default(0)
+  finalAngryInvestors Int @default(0)
+  finalFakeNews Int @default(0)
+  
+  // Eventos durante o torneio
+  events TournamentEvent[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([tournamentId, startupId])
+}
+
+model TournamentEvent {
+  id          String   @id @default(uuid())
+  participation TournamentParticipation @relation(fields: [participationId], references: [id])
+  participationId String
+  
+  // Tipo do evento (PITCH, BUG, TRACTION, ANGRY_INVESTOR, FAKE_NEWS)
+  eventType String
+  
+  // Fase do torneio em que ocorreu (FIRST_ROUND, SEMI_FINAL, FINAL)
+  roundPhase String
+  
+  // Descrição opcional do evento
+  description String?
+  
+  createdAt DateTime @default(now())
+
+  @@index([participationId])
+}
+
+model Battle {
+  id          String   @id @default(uuid())
+  round       Int
+  tournament  Tournament @relation(fields: [tournamentId], references: [id])
+  tournamentId String
+  startup1Id  String
+  startup2Id  String
+  winnerId    String?
+  isCompleted Boolean @default(false)
+  hadSharkAttack Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

@@ -20,7 +20,9 @@ interface TournamentState {
   addEvent: (battleId: string, startupId: string, eventType: EventType) => void;
   getCurrentBattles: () => Battle[];
   getStartupById: (id: string) => Startup | undefined;
+  resetTournament: () => void; // 👈 aqui
 }
+
 
 const INITIAL_SCORE = 70;
 const WINNER_BONUS = 30;
@@ -34,6 +36,8 @@ const EventPoints: Record<EventType, number> = {
 };
 
 export const useTournamentStore = create<TournamentState>((set, get) => ({
+  resetTournament: () => set({ tournament: null }),
+
   tournament: null,
 
   setTournament: (tournament) => set({ tournament }),

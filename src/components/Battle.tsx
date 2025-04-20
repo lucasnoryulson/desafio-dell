@@ -246,26 +246,18 @@ export default function Battle() {
     return 'Quartas de Final';
   };
 
-  const handleCompleteBattle = () => {
-    if (!battle || !startup1 || !startup2) return;
-
-    const isFinalBattle = battle.round === (tournament?.startups.length === 4 ? 2 : 3);
-    console.log('Completing battle', { 
-      battleId: battle.id, 
-      round: battle.round, 
-      isFinalBattle,
-      totalStartups: tournament?.startups.length
-    });
-
-    // Verifica se há empate
+  const handleCompleteBattle = async () => {
+    if (!battle || !startup1 || !startup2 || !tournament) return;
+  
+    const isFinalBattle = battle.round === (tournament.startups.length === 4 ? 2 : 3);
+  
+    // Verifica empate
     if (startup1.score === startup2.score) {
-      // Primeiro mostra o banner do Shark Fight
       setShowSharkFight(true);
-
-      // Após 1 segundo, atualiza a pontuação
+  
       setTimeout(() => {
         const luckyStartup = Math.random() < 0.5 ? startup1 : startup2;
-        
+  
         if (luckyStartup.id === startup1.id) {
           const updatedStartup1 = {
             ...startup1,
@@ -279,22 +271,31 @@ export default function Battle() {
           };
           setStartup2(updatedStartup2);
         }
-
-        // Após mais 2 segundos (total de 3s), finaliza a batalha e navega
-        setTimeout(() => {
+  
+        setTimeout(async () => {
           if (battle && luckyStartup) {
             completeBattle(battle.id, luckyStartup.id);
+  
+            if (isFinalBattle) {
+              await salvarHistoricoAutomaticamente(tournament);
+            }
+  
             navigate('/tournament');
           }
         }, 2000);
       }, 1000);
     } else {
-      // Sem empate, procede normalmente
       const winner = startup1.score > startup2.score ? startup1 : startup2;
       completeBattle(battle.id, winner.id);
+  
+      if (isFinalBattle) {
+        await salvarHistoricoAutomaticamente(tournament);
+      }
+  
       navigate('/tournament');
     }
   };
+  
 
   const canCompleteBattle = () => {
     return true;
@@ -411,6 +412,40 @@ export default function Battle() {
       </Paper>
     );
   };
+
+  const salvarHistoricoAutomaticamente = async (tournament: {
+    id: string;
+    startups: Startup[];
+  }) => {
+    const payload = tournament.startups.map((startup: Startup, index: number) => ({
+      startupId: startup.id,
+      tournamentId: tournament.id,
+      finalPosition: index + 1,
+      finalScore: startup.score,
+      finalPitches: startup.stats.pitches,
+      finalBugs: startup.stats.bugs,
+      finalTractions: startup.stats.tractions,
+      finalAngryInvestors: startup.stats.angryInvestors,
+      finalFakeNews: startup.stats.fakeNews,
+    }));
+  
+    try {
+      const response = await fetch("http://localhost:3001/api/tournament/finalize", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+  
+      const result = await response.json();
+      console.log("✅ Histórico salvo automaticamente:", result);
+    } catch (err) {
+      console.error("❌ Erro ao salvar histórico automaticamente:", err);
+    }
+  };
+  
+  
 
   const renderEventDialog = () => (
     <Dialog 

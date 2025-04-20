@@ -27,6 +27,8 @@ import { useNavigate } from 'react-router-dom';
 export const FinalReport: React.FC = () => {
   const { tournament } = useTournamentStore();
   const navigate = useNavigate();
+  const { resetTournament } = useTournamentStore();
+
 
   // Adiciona um console.log para debug
   console.log('FinalReport rendered', { 
@@ -367,20 +369,29 @@ export const FinalReport: React.FC = () => {
             </TableBody>
           </Table>
         </TableContainer>
-          <Box sx={{ mt: 4, display: 'flex', justifyContent: 'center' }}>
-    <Button
-      variant="contained"
-      onClick={handleSaveHistory}
-      sx={{
-        background: 'linear-gradient(135deg, #4CAF50 0%, #2e7d32 100%)',
-        '&:hover': {
-          background: 'linear-gradient(135deg, #2e7d32 0%, #4CAF50 100%)',
-        },
-      }}
-    >
-      Salvar Histórico no Backend
-    </Button>
-  </Box>
+        <Box sx={{ mt: 4, display: 'flex', justifyContent: 'center' }}>
+  <Button
+
+    variant="contained"
+    onClick={() => {
+      resetTournament();   // limpa store
+      navigate('/');       // redireciona pra página inicial
+    }}
+    sx={{
+      background: 'linear-gradient(135deg, #1976d2 0%, #1565c0 100%)',
+      '&:hover': {
+        background: 'linear-gradient(135deg, #1565c0 0%, #1976d2 100%)',
+      },
+      fontWeight: 'bold',
+      px: 4,
+      py: 1.5,
+      fontSize: '1rem'
+    }}
+  >
+    Iniciar Novo Torneio
+  </Button>
+</Box>
+
 
       </Container>
     </Box>

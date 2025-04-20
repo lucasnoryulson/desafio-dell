@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="400" height="400" viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Rocket Body -->
+  <path d="M200 50C200 50 150 150 150 250C150 300 200 350 200 350C200 350 250 300 250 250C250 150 200 50 200 50Z" fill="white"/>
+  
+  <!-- Rocket Window -->
+  <circle cx="200" cy="200" r="30" fill="#FF6B6B"/>
+  
+  <!-- Rocket Fins -->
+  <path d="M150 250L100 300L150 350" fill="white"/>
+  <path d="M250 250L300 300L250 350" fill="white"/>
+  
+  <!-- Rocket Flames -->
+  <path d="M180 350C180 350 200 400 220 350" fill="#FFD700"/>
+  
+  <!-- Stars -->
+  <circle cx="100" cy="100" r="5" fill="white"/>
+  <circle cx="300" cy="150" r="5" fill="white"/>
+  <circle cx="150" cy="80" r="5" fill="white"/>
+  <circle cx="250" cy="120" r="5" fill="white"/>
+  <circle cx="80" cy="200" r="5" fill="white"/>
+  <circle cx="320" cy="220" r="5" fill="white"/>
+</svg> 

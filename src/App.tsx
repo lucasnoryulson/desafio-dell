@@ -8,6 +8,7 @@ import Battle from './components/Battle';
 import { FinalReport } from './components/FinalReport';
 import { StartupDetails } from './components/StartupDetails';
 import { TournamentMenu } from './components/TournamentMenu';
+import { LandingPage } from './components/LandingPage';
 import { useTournamentStore } from './store/tournamentStore';
 import AssessmentIcon from '@mui/icons-material/Assessment';
 
@@ -17,7 +18,8 @@ function MainContent() {
   const showMenu = tournament && 
     tournament.battles && 
     tournament.battles.length > 0 && 
-    !location.pathname.includes('/battle/');
+    !location.pathname.includes('/battle/') &&
+    location.pathname !== '/';
 
   console.log('App rendered', { 
     tournamentExists: !!tournament, 
@@ -30,7 +32,8 @@ function MainContent() {
     <>
       {showMenu && <TournamentMenu />}
       <Routes>
-        <Route path="/" element={<StartupRegistration />} />
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/register" element={<StartupRegistration />} />
         <Route path="/tournament" element={<TournamentBracket />} />
         <Route path="/battle/:battleId" element={<Battle />} />
         <Route path="/report" element={<FinalReport />} />

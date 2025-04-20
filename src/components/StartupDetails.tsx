@@ -21,16 +21,7 @@ import NewspaperIcon from '@mui/icons-material/Newspaper';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
 
-const EventIcon = ({ eventType }: { eventType: string }) => {
-  switch (eventType) {
-    case 'PITCH': return <RocketLaunchIcon sx={{ color: '#4CAF50' }} />;
-    case 'BUG': return <BugReportIcon sx={{ color: '#f44336' }} />;
-    case 'TRACTION': return <TrendingUpIcon sx={{ color: '#2196f3' }} />;
-    case 'ANGRY_INVESTOR': return <SentimentVeryDissatisfiedIcon sx={{ color: '#ff9800' }} />;
-    case 'FAKE_NEWS': return <NewspaperIcon sx={{ color: '#9c27b0' }} />;
-    default: return null;
-  }
-};
+// ...importações mantidas como estão
 
 export const StartupDetails: React.FC = () => {
   const { startupId } = useParams<{ startupId: string }>();
@@ -134,34 +125,53 @@ export const StartupDetails: React.FC = () => {
                   Histórico de Participações
                 </Typography>
                 {startup.participations?.length > 0 ? (
-                  startup.participations.map((p: any) => (
-                    <Box key={p.id} sx={{
-                      border: `1px solid ${p.finalPosition === 1 ? '#FFD700' : p.finalPosition === 2 ? '#C0C0C0' : '#ddd'}`,
-                      backgroundColor: p.finalPosition === 1 ? 'rgba(255,215,0,0.1)' : p.finalPosition === 2 ? 'rgba(192,192,192,0.1)' : '#f9f9f9',
-                      borderRadius: 2,
-                      p: 2,
-                      mb: 2
-                    }}>
-                      <Box display="flex" alignItems="center" mb={1}>
-                        {p.finalPosition <= 2 && (
-                          <EmojiEventsIcon sx={{ color: p.finalPosition === 1 ? '#FFD700' : '#C0C0C0', mr: 1 }} />
-                        )}
-                        <Typography variant="h6" fontWeight="bold">
-                          Edição {p.tournamentId} • {p.finalPosition}º lugar
+                  startup.participations.map((p: any, index: number) => {
+                    const isGold = p.finalPosition === 1;
+                    const isSilver = p.finalPosition === 2;
+
+                    return (
+                      <Box
+                        key={p.id}
+                        sx={{
+                          border: `1px solid ${isGold ? '#FFD700' : isSilver ? '#C0C0C0' : '#ddd'}`,
+                          backgroundColor: isGold
+                            ? 'rgba(255,215,0,0.1)'
+                            : isSilver
+                              ? 'rgba(192,192,192,0.1)'
+                              : '#f9f9f9',
+                          borderRadius: 2,
+                          p: 2,
+                          mb: 3,
+                          transition: 'transform 0.2s ease-in-out',
+                          '&:hover': {
+                            transform: 'scale(1.02)',
+                          }
+                        }}
+                      >
+                        <Box display="flex" alignItems="center" mb={1}>
+                          {isGold || isSilver ? (
+                            <EmojiEventsIcon sx={{ color: isGold ? '#FFD700' : '#C0C0C0', mr: 1 }} />
+                          ) : null}
+                          <Typography variant="h6" fontWeight="bold">
+                            Edição {index + 1} • {p.finalPosition}º lugar
+                          </Typography>
+                        </Box>
+                        <Typography variant="body2" sx={{ fontStyle: 'italic', mb: 1 }}>
+                          Participação em: {new Date(p.createdAt).toLocaleDateString('pt-BR')}
                         </Typography>
+                        <Typography variant="body1" mb={1}>
+                          Pontuação: {p.finalScore}
+                        </Typography>
+                        <Grid container spacing={1}>
+                          <Grid item><Chip size="small" icon={<RocketLaunchIcon />} label={`Pitches: ${p.finalPitches}`} /></Grid>
+                          <Grid item><Chip size="small" icon={<BugReportIcon />} label={`Bugs: ${p.finalBugs}`} /></Grid>
+                          <Grid item><Chip size="small" icon={<TrendingUpIcon />} label={`Tração: ${p.finalTractions}`} /></Grid>
+                          <Grid item><Chip size="small" icon={<SentimentVeryDissatisfiedIcon />} label={`Investidores Irritados: ${p.finalAngryInvestors}`} /></Grid>
+                          <Grid item><Chip size="small" icon={<NewspaperIcon />} label={`Fake News: ${p.finalFakeNews}`} /></Grid>
+                        </Grid>
                       </Box>
-                      <Typography variant="body1" mb={1}>
-                        Pontuação: {p.finalScore}
-                      </Typography>
-                      <Grid container spacing={1}>
-                        <Grid item><Chip size="small" icon={<RocketLaunchIcon />} label={`Pitches: ${p.finalPitches}`} /></Grid>
-                        <Grid item><Chip size="small" icon={<BugReportIcon />} label={`Bugs: ${p.finalBugs}`} /></Grid>
-                        <Grid item><Chip size="small" icon={<TrendingUpIcon />} label={`Tração: ${p.finalTractions}`} /></Grid>
-                        <Grid item><Chip size="small" icon={<SentimentVeryDissatisfiedIcon />} label={`Investidores Irritados: ${p.finalAngryInvestors}`} /></Grid>
-                        <Grid item><Chip size="small" icon={<NewspaperIcon />} label={`Fake News: ${p.finalFakeNews}`} /></Grid>
-                      </Grid>
-                    </Box>
-                  ))
+                    );
+                  })
                 ) : (
                   <Typography align="center">Nenhuma participação anterior</Typography>
                 )}

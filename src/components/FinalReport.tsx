@@ -25,9 +25,8 @@ import NewspaperIcon from '@mui/icons-material/Newspaper';
 import { useNavigate } from 'react-router-dom';
 
 export const FinalReport: React.FC = () => {
-  const { tournament } = useTournamentStore();
+  const { tournament, setTournament, resetTournament } = useTournamentStore();
   const navigate = useNavigate();
-  const { resetTournament } = useTournamentStore();
 
 
   // Adiciona um console.log para debug
@@ -81,7 +80,6 @@ export const FinalReport: React.FC = () => {
     return b.score - a.score;
   });
   const handleSaveHistory = async () => {
-    // 1. Cria o torneio no backend e pega o ID real (UUID)
     let tournamentId = "";
     try {
       const response = await fetch("http://localhost:3001/api/tournaments", {
@@ -97,7 +95,6 @@ export const FinalReport: React.FC = () => {
       return;
     }
   
-    // 2. Monta o payload com o tournamentId real
     const payload = sortedStartups.map((startup, index) => ({
       startupId: startup.id,
       tournamentId,
@@ -112,7 +109,6 @@ export const FinalReport: React.FC = () => {
   
     console.log("📦 Payload enviado para o backend:", payload);
   
-    // 3. Envia o payload para salvar o histórico
     try {
       const response = await fetch('http://localhost:3001/api/tournament/finalize', {
         method: 'POST',
@@ -125,11 +121,37 @@ export const FinalReport: React.FC = () => {
       const result = await response.json();
       console.log("✅ Resposta do backend:", result);
       alert('Histórico salvo com sucesso!');
+  
+      // Atualiza startups com participationHistory na store
+      const updatedStartups = sortedStartups.map((startup, index) => ({
+        ...startup,
+        participationHistory: [
+          ...(startup.participationHistory || []),
+          {
+            edition: parseInt(tournamentId.split('-')[1], 10),
+            position: index + 1,
+            score: startup.score,
+            finalPitches: startup.stats.pitches,
+            finalBugs: startup.stats.bugs,
+            finalTractions: startup.stats.tractions,
+            finalAngryInvestors: startup.stats.angryInvestors,
+            finalFakeNews: startup.stats.fakeNews,
+            events: [] // ← se tiver os eventos, você pode preencher aqui
+          }
+        ]
+      }));
+  
+      setTournament({
+        ...tournament!,
+        startups: updatedStartups
+      });
+  
     } catch (error) {
       console.error("❌ Erro ao salvar histórico:", error);
       alert('Erro ao salvar histórico');
     }
   };
+  
   
   
 

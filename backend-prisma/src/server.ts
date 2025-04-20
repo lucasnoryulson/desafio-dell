@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { Request, Response } from 'express';
 import cors from 'cors';
 import { PrismaClient } from '@prisma/client';
 import { z } from 'zod';
@@ -19,12 +19,42 @@ const createStartupSchema = z.object({
 
 type CreateStartupInput = z.infer<typeof createStartupSchema>;
 
+app.get('/teste', (req, res) => {
+  res.send('Servidor está funcionando!');
+});
+
+app.get('/api/startups/:id', async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const startup = await prisma.startup.findUnique({
+      where: { id },
+      include: {
+        participations: true,
+      },
+    });
+
+    if (!startup) {
+      return res.status(404).json({ error: 'Startup não encontrada' });
+    }
+
+    res.status(200).json(startup);
+  } catch (error) {
+    console.error('Erro ao buscar startup por ID:', error);
+    res.status(500).json({ error: 'Erro interno do servidor' });
+  }
+});
+
+
+
+
+
+
 // Rota para criar uma startup
-app.post('/api/startups', async (req, res) => {
+app.post('/api/startups', async (req: Request, res: Response) => {
   try {
     const data = createStartupSchema.parse(req.body);
 
-    // 1. Cria startup
     const startup = await prisma.startup.create({
       data: {
         ...data,
@@ -32,18 +62,14 @@ app.post('/api/startups', async (req, res) => {
       }
     });
 
-    // 2. Busca ou cria um torneio ativo
     let tournament = await prisma.tournament.findFirst({
       where: { isCompleted: false },
     });
 
     if (!tournament) {
-      tournament = await prisma.tournament.create({
-        data: {},
-      });
+      tournament = await prisma.tournament.create({ data: {} });
     }
 
-    // 3. Cria participação da startup no torneio
     await prisma.tournamentParticipation.create({
       data: {
         startupId: startup.id,
@@ -62,9 +88,8 @@ app.post('/api/startups', async (req, res) => {
   }
 });
 
-
 // Rota para criar uma startup de teste
-app.post('/api/startups/test', async (_req, res) => {
+app.post('/api/startups/test', async (_req: Request, res: Response) => {
   try {
     const testStartup = await prisma.startup.create({
       data: {
@@ -75,8 +100,7 @@ app.post('/api/startups/test', async (_req, res) => {
         score: 70,
       }
     });
-    
-    console.log(`Startup de teste criada:`, testStartup);
+
     res.status(201).json(testStartup);
   } catch (error) {
     console.error('Erro ao criar startup de teste:', error);
@@ -85,12 +109,10 @@ app.post('/api/startups/test', async (_req, res) => {
 });
 
 // Rota para listar todas as startups
-app.get('/api/startups', async (_req, res) => {
+app.get('/api/startups', async (_req: Request, res: Response) => {
   try {
     const startups = await prisma.startup.findMany({
-      include: {
-        participations: true
-      }
+      include: { participations: true }
     });
     res.json(startups);
   } catch (error) {
@@ -99,24 +121,20 @@ app.get('/api/startups', async (_req, res) => {
   }
 });
 
-
 // Rota para verificar se uma startup já existe pelo nome
-app.get('/api/startups/check/:name', async (req, res) => {
+app.get('/api/startups/check/:name', async (req: Request, res: Response) => {
   try {
     const { name } = req.params;
-    console.log(`Verificando startup com nome: "${name}"`);
-    
+
     const startup = await prisma.startup.findFirst({
       where: {
         name: {
           equals: name,
-          mode: 'insensitive' // Case insensitive search
+          mode: 'insensitive'
         }
       }
     });
-    
-    console.log(`Resultado da busca:`, startup ? `Encontrada: ${startup.name}` : 'Não encontrada');
-    
+
     if (startup) {
       res.json({ exists: true, startup });
     } else {
@@ -128,9 +146,34 @@ app.get('/api/startups/check/:name', async (req, res) => {
   }
 });
 
+// ✅ Rota para buscar uma startup por ID
+app.get('/api/startups/:id', async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const startup = await prisma.startup.findUnique({
+      where: { id },
+      include: {
+        participations: true,
+      },
+    });
+
+    if (!startup) {
+      res.status(404).json({ error: 'Startup não encontrada' });
+      return;
+    }
+
+    res.json(startup);
+  } catch (error) {
+    console.error('Erro ao buscar startup por ID:', error);
+    res.status(500).json({ error: 'Erro interno do servidor' });
+  }
+});
+
+
 
 // Rota para salvar os resultados finais do torneio
-app.post('/api/tournament/finalize', async (req, res) => {
+app.post('/api/tournament/finalize', async (req: Request, res: Response) => {
   const participations = req.body;
 
   try {
@@ -172,10 +215,11 @@ app.post('/api/tournament/finalize', async (req, res) => {
   }
 });
 
-app.post('/api/tournaments', async (req, res) => {
+// Rota para criar um novo torneio
+app.post('/api/tournaments', async (_req: Request, res: Response) => {
   try {
     const tournament = await prisma.tournament.create({
-      data: {} // você pode incluir outros campos, se quiser
+      data: {}
     });
 
     res.status(201).json(tournament);
@@ -189,4 +233,4 @@ const PORT = process.env.PORT || 3001;
 
 app.listen(PORT, () => {
   console.log(`Servidor rodando na porta ${PORT}`);
-}); 
+});

@@ -9,7 +9,6 @@ import {
   List,
   ListItem,
   ListItemText,
-  Divider,
   Container,
   Alert,
   Snackbar,
@@ -22,7 +21,6 @@ import { useNavigate } from 'react-router-dom';
 import { useTournamentStore } from '../store/tournamentStore';
 import { Startup } from '../types';
 import RocketLaunchIcon from '@mui/icons-material/RocketLaunch';
-import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
 
 const API_URL = 'http://localhost:3001/api';
 
@@ -145,231 +143,270 @@ export const StartupRegistration: React.FC = () => {
         minHeight: '100vh',
         width: '100%',
         display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        background: 'linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%)',
-        py: 4
+        backgroundColor: '#f8f9fa',
+        position: 'relative',
       }}
     >
-      <Container maxWidth="lg">
-        <Grid container spacing={4} justifyContent="center">
-          {/* Left Section */}
-          <Grid item xs={12} md={6}>
-            <Typography 
-              variant="h3" 
-              component="h1" 
-              align="center" 
-              sx={{ 
-                color: 'white',
+      {/* Formulário de Cadastro - Lado Esquerdo */}
+      <Box
+        sx={{
+          width: { xs: '100%', md: '50%' },
+          p: { xs: 2, md: 4 },
+          backgroundColor: '#fff',
+          borderRight: '1px solid rgba(0,0,0,0.1)',
+          display: 'flex',
+          flexDirection: 'column',
+        }}
+      >
+        <Box sx={{ maxWidth: '600px', width: '100%', margin: '0 auto' }}>
+          <Typography
+            variant="h4"
+            sx={{
+              fontWeight: 900,
+              color: '#1a1a1a',
+              mb: 4,
+              fontFamily: "'Inter', sans-serif",
+              pt: { xs: 0, md: 4 },
+            }}
+          >
+            Cadastre sua Startup
+          </Typography>
+
+          <Box component="form" onSubmit={handleSubmit}>
+            <TextField
+              fullWidth
+              label="Nome da Startup"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              required
+              sx={{
+                mb: 3,
+                '& .MuiOutlinedInput-root': {
+                  borderRadius: 2,
+                  backgroundColor: '#f8f9fa',
+                },
+              }}
+            />
+
+            <TextField
+              fullWidth
+              label="Slogan"
+              value={slogan}
+              onChange={(e) => setSlogan(e.target.value)}
+              required
+              sx={{
+                mb: 3,
+                '& .MuiOutlinedInput-root': {
+                  borderRadius: 2,
+                  backgroundColor: '#f8f9fa',
+                },
+              }}
+            />
+
+            <TextField
+              fullWidth
+              label="Descrição"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              multiline
+              rows={4}
+              sx={{
+                mb: 3,
+                '& .MuiOutlinedInput-root': {
+                  borderRadius: 2,
+                  backgroundColor: '#f8f9fa',
+                },
+              }}
+            />
+
+            <TextField
+              fullWidth
+              label="Ano de Fundação"
+              type="number"
+              value={foundingYear}
+              onChange={(e) => setFoundingYear(e.target.value)}
+              required
+              inputProps={{ min: 1900, max: new Date().getFullYear() }}
+              sx={{
                 mb: 4,
-                fontWeight: 'bold',
-                textShadow: '2px 2px 4px rgba(0,0,0,0.2)'
+                '& .MuiOutlinedInput-root': {
+                  borderRadius: 2,
+                  backgroundColor: '#f8f9fa',
+                },
+              }}
+            />
+
+            <Button
+              type="submit"
+              fullWidth
+              variant="contained"
+              size="large"
+              disabled={(tournament?.startups.length || 0) >= 8}
+              sx={{
+                py: 1.5,
+                backgroundColor: '#ff4d4d',
+                fontSize: '1.1rem',
+                fontWeight: 600,
+                borderRadius: 2,
+                textTransform: 'none',
+                '&:hover': {
+                  backgroundColor: '#ff3333',
+                },
               }}
             >
-              Startup Rush
-            </Typography>
-            <Typography 
-              variant="h5" 
-              align="center" 
-              sx={{ 
-                color: 'white',
-                mb: 6,
-                textShadow: '1px 1px 2px rgba(0,0,0,0.2)'
-              }}
-            >
-              Cadastre sua startup e participe do torneio mais emocionante do ecossistema!
-            </Typography>
-          </Grid>
+              Cadastrar Startup
+            </Button>
+          </Box>
+        </Box>
+      </Box>
 
-          {/* Right Section */}
-          <Grid item xs={12} md={6}>
-            <Paper 
-              elevation={3} 
-              sx={{ 
-                p: 4,
-                borderRadius: 3,
-                backgroundColor: 'rgba(255, 255, 255, 0.95)',
-                backdropFilter: 'blur(10px)'
-              }}
-            >
-              <Typography 
-                variant="h4" 
-                gutterBottom 
-                align="center" 
-                sx={{ 
-                  fontWeight: 'bold',
-                  color: '#FF6B6B'
-                }}
-              >
-                Cadastre sua Startup
-              </Typography>
+      {/* Lista de Startups - Lado Direito */}
+      <Box
+        sx={{
+          width: { xs: '100%', md: '50%' },
+          p: { xs: 2, md: 4 },
+          display: { xs: 'block', md: 'block' },
+          backgroundColor: '#fff',
+        }}
+      >
+        <Box sx={{ maxWidth: '600px', width: '100%', margin: '0 auto' }}>
+          <Typography
+            variant="h4"
+            sx={{
+              fontWeight: 900,
+              color: '#1a1a1a',
+              mb: 2,
+              fontFamily: "'Inter', sans-serif",
+              pt: { xs: 0, md: 4 },
+            }}
+          >
+            Participantes
+          </Typography>
 
-              <Box component="form" onSubmit={handleSubmit} sx={{ mt: 3 }}>
-                <Grid container spacing={3}>
-                  <Grid item xs={12}>
-                    <TextField
-                      fullWidth
-                      label="Nome da Startup"
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                      required
-                      variant="outlined"
-                      sx={{ 
-                        '& .MuiOutlinedInput-root': {
-                          borderRadius: 2
-                        }
-                      }}
-                    />
-                  </Grid>
-                  <Grid item xs={12}>
-                    <TextField
-                      fullWidth
-                      label="Slogan"
-                      value={slogan}
-                      onChange={(e) => setSlogan(e.target.value)}
-                      required
-                      variant="outlined"
-                      sx={{ 
-                        '& .MuiOutlinedInput-root': {
-                          borderRadius: 2
-                        }
-                      }}
-                    />
-                  </Grid>
-                  <Grid item xs={12}>
-                    <TextField
-                      fullWidth
-                      label="Descrição"
-                      value={description}
-                      onChange={(e) => setDescription(e.target.value)}
-                      multiline
-                      rows={4}
-                      variant="outlined"
-                      sx={{ 
-                        '& .MuiOutlinedInput-root': {
-                          borderRadius: 2
-                        }
-                      }}
-                    />
-                  </Grid>
-                  <Grid item xs={12}>
-                    <TextField
-                      fullWidth
-                      label="Ano de Fundação"
-                      type="number"
-                      value={foundingYear}
-                      onChange={(e) => setFoundingYear(e.target.value)}
-                      required
-                      variant="outlined"
-                      inputProps={{ min: 1900, max: new Date().getFullYear() }}
-                      sx={{ 
-                        '& .MuiOutlinedInput-root': {
-                          borderRadius: 2
-                        }
-                      }}
-                    />
-                  </Grid>
-                  <Grid item xs={12}>
-                    <Button
-                      type="submit"
-                      fullWidth
-                      size="large"
-                      disabled={(tournament?.startups.length || 0) >= 8}
-                      sx={{ 
-                        height: 48,
-                        borderRadius: 2,
-                        fontWeight: 'bold',
-                        fontSize: '1.1rem',
-                        background: 'linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%)',
-                        color: 'white',
-                        '&:hover': {
-                          background: 'linear-gradient(135deg, #FF8E53 0%, #FF6B6B 100%)',
-                        }
-                      }}
-                    >
-                      Cadastrar Startup
-                    </Button>
-                  </Grid>
-                </Grid>
-              </Box>
+          <Typography
+            variant="body2"
+            sx={{
+              color: '#666',
+              mb: 4,
+              fontStyle: 'italic',
+            }}
+          >
+            O torneio requer no mínimo 4 e no máximo 8 startups para começar
+          </Typography>
 
-              {tournament?.startups.length ? (
-                <>
-                  <Divider sx={{ my: 4 }} />
-                  <Typography 
-                    variant="h6" 
-                    gutterBottom 
-                    align="center" 
-                    sx={{ 
-                      fontWeight: 'bold',
-                      color: '#FF6B6B'
+          {tournament?.startups.length ? (
+            <>
+              <List sx={{ mb: 4 }}>
+                {tournament.startups.map((startup) => (
+                  <Paper
+                    key={startup.id}
+                    elevation={0}
+                    sx={{
+                      mb: 2,
+                      p: 2,
+                      borderRadius: 2,
+                      border: '1px solid rgba(0,0,0,0.1)',
+                      transition: 'transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out',
+                      '&:hover': {
+                        transform: 'translateY(-2px)',
+                        boxShadow: '0 4px 10px rgba(0,0,0,0.1)',
+                      },
                     }}
                   >
-                    Startups Cadastradas
-                  </Typography>
-                  <List sx={{ 
-                    bgcolor: 'background.paper', 
-                    borderRadius: 2,
-                    border: '1px solid rgba(0,0,0,0.1)'
-                  }}>
-                    {tournament.startups.map((startup) => (
-                      <ListItem key={startup.id}>
-                        <ListItemText
-                          primary={startup.name}
-                          secondary={`${startup.slogan} (${startup.foundingYear})`}
-                          primaryTypographyProps={{ fontWeight: 'medium' }}
-                        />
-                      </ListItem>
-                    ))}
-                  </List>
-                  <Box sx={{ mt: 4, display: 'flex', justifyContent: 'center' }}>
-                    <Button
-                      variant="contained"
-                      color="success"
-                      size="large"
-                      onClick={handleStartTournament}
-                      disabled={(tournament.startups.length || 0) < 4}
+                    <Typography
+                      variant="h6"
                       sx={{
-                        borderRadius: 2,
-                        fontWeight: 'bold',
-                        fontSize: '1.1rem'
+                        fontWeight: 600,
+                        color: '#1a1a1a',
+                        mb: 0.5,
                       }}
                     >
-                      Iniciar Torneio
-                    </Button>
-                  </Box>
-                </>
-              ) : null}
-            </Paper>
-          </Grid>
-        </Grid>
-      </Container>
+                      {startup.name}
+                    </Typography>
+                    <Typography
+                      variant="body2"
+                      sx={{
+                        color: '#666',
+                        fontStyle: 'italic',
+                        mb: 1,
+                      }}
+                    >
+                      {startup.slogan}
+                    </Typography>
+                    <Typography
+                      variant="caption"
+                      sx={{ color: '#999' }}
+                    >
+                      Fundada em {startup.foundingYear}
+                    </Typography>
+                  </Paper>
+                ))}
+              </List>
 
-      {/* Error Snackbar */}
-      <Snackbar 
-        open={!!error} 
-        autoHideDuration={6000} 
+              <Button
+                variant="contained"
+                size="large"
+                onClick={handleStartTournament}
+                disabled={(tournament.startups.length || 0) < 4}
+                startIcon={<RocketLaunchIcon />}
+                sx={{
+                  width: '100%',
+                  backgroundColor: '#4CAF50',
+                  color: 'white',
+                  py: 1.5,
+                  fontSize: '1.1rem',
+                  fontWeight: 600,
+                  borderRadius: 2,
+                  textTransform: 'none',
+                  '&:hover': {
+                    backgroundColor: '#43A047',
+                  },
+                  '&:disabled': {
+                    backgroundColor: 'rgba(0,0,0,0.12)',
+                  },
+                }}
+              >
+                Iniciar Torneio
+              </Button>
+            </>
+          ) : (
+            <Typography
+              variant="body1"
+              sx={{
+                color: '#666',
+                textAlign: 'center',
+                py: 8,
+              }}
+            >
+              Nenhuma startup cadastrada ainda.
+            </Typography>
+          )}
+        </Box>
+      </Box>
+
+      {/* Snackbars e Dialog */}
+      <Snackbar
+        open={!!error}
+        autoHideDuration={6000}
         onClose={() => setError(null)}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
       >
-        <Alert onClose={() => setError(null)} severity="error" sx={{ width: '100%' }}>
+        <Alert onClose={() => setError(null)} severity="error">
           {error}
         </Alert>
       </Snackbar>
 
-      {/* Success Snackbar */}
-      <Snackbar 
-        open={success} 
-        autoHideDuration={6000} 
+      <Snackbar
+        open={success}
+        autoHideDuration={6000}
         onClose={() => setSuccess(false)}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
       >
-        <Alert onClose={() => setSuccess(false)} severity="success" sx={{ width: '100%' }}>
+        <Alert onClose={() => setSuccess(false)} severity="success">
           Startup cadastrada com sucesso!
         </Alert>
       </Snackbar>
 
-      {/* Dialog de confirmação para startup existente */}
       <Dialog
         open={dialogOpen}
         onClose={() => setDialogOpen(false)}
@@ -377,31 +414,22 @@ export const StartupRegistration: React.FC = () => {
           sx: {
             borderRadius: 2,
             maxWidth: 'sm',
-            width: '100%'
+            width: '100%',
           }
         }}
       >
-        <DialogTitle sx={{ 
-          background: 'linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%)',
-          color: 'white',
-          fontWeight: 'bold'
-        }}>
+        <DialogTitle sx={{ fontWeight: 'bold' }}>
           Startup já cadastrada
         </DialogTitle>
-        <DialogContent sx={{ mt: 2 }}>
+        <DialogContent>
           <Typography>
             A startup "{existingStartup?.name}" já está cadastrada no sistema. Deseja inscrevê-la na competição?
           </Typography>
         </DialogContent>
-        <DialogActions sx={{ p: 2 }}>
-          <Button 
+        <DialogActions>
+          <Button
             onClick={() => setDialogOpen(false)}
-            sx={{ 
-              color: '#666',
-              '&:hover': {
-                backgroundColor: 'rgba(0,0,0,0.05)'
-              }
-            }}
+            sx={{ color: '#666' }}
           >
             Não, cadastrar nova
           </Button>
@@ -409,10 +437,9 @@ export const StartupRegistration: React.FC = () => {
             onClick={handleUseExistingStartup}
             variant="contained"
             sx={{
-              background: 'linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%)',
-              color: 'white',
+              backgroundColor: '#ff4d4d',
               '&:hover': {
-                background: 'linear-gradient(135deg, #FF8E53 0%, #FF6B6B 100%)',
+                backgroundColor: '#ff3333',
               }
             }}
           >

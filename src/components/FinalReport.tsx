@@ -22,6 +22,7 @@ import BugReportIcon from '@mui/icons-material/BugReport';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import SentimentVeryDissatisfiedIcon from '@mui/icons-material/SentimentVeryDissatisfied';
 import NewspaperIcon from '@mui/icons-material/Newspaper';
+import InfoIcon from '@mui/icons-material/Info';
 import { useNavigate } from 'react-router-dom';
 
 export const FinalReport: React.FC = () => {
@@ -43,23 +44,36 @@ export const FinalReport: React.FC = () => {
         sx={{
           minHeight: '100vh',
           width: '100%',
-          background: 'linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%)',
+          backgroundColor: 'white',
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
           justifyContent: 'center'
         }}
       >
-        <Typography variant="h5" sx={{ color: 'white', textAlign: 'center', mb: 2 }}>
+        <Typography 
+          variant="h5" 
+          sx={{ 
+            color: '#FF6B6B', 
+            textAlign: 'center', 
+            mb: 2,
+            fontFamily: "'Inter', sans-serif",
+            fontWeight: 600
+          }}
+        >
           Nenhum torneio em andamento
         </Typography>
         <Button
           variant="contained"
           onClick={() => navigate('/')}
           sx={{ 
-            background: 'linear-gradient(135deg, #4CAF50 0%, #45a049 100%)',
+            background: 'linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%)',
+            color: 'white',
+            fontFamily: "'Inter', sans-serif",
+            fontWeight: 600,
+            textTransform: 'none',
             '&:hover': {
-              background: 'linear-gradient(135deg, #45a049 0%, #4CAF50 100%)',
+              background: 'linear-gradient(135deg, #FF8E53 0%, #FF6B6B 100%)',
             }
           }}
         >
@@ -160,7 +174,7 @@ export const FinalReport: React.FC = () => {
       sx={{
         minHeight: '100vh',
         width: '100%',
-        background: 'linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%)',
+        backgroundColor: 'white',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
@@ -177,10 +191,12 @@ export const FinalReport: React.FC = () => {
           component="h1"
           align="center"
           sx={{
-            color: 'white',
+            color: '#FF6B6B',
             mb: 6,
-            fontWeight: 'bold',
-            textShadow: '2px 2px 4px rgba(0,0,0,0.2)'
+            fontWeight: 900,
+            fontFamily: "'Inter', sans-serif",
+            fontSize: { xs: '2rem', sm: '2.5rem', md: '3rem' },
+            letterSpacing: '-0.02em'
           }}
         >
           {tournament.isCompleted ? 'Relatório Final do Torneio' : 'Relatório Parcial do Torneio'}
@@ -222,9 +238,9 @@ export const FinalReport: React.FC = () => {
                 variant="h4"
                 sx={{
                   color: 'white',
-                  fontWeight: 'bold',
+                  fontWeight: 900,
                   mb: 1,
-                  textShadow: '1px 1px 2px rgba(0,0,0,0.2)'
+                  fontFamily: "'Inter', sans-serif"
                 }}
               >
                 {tournament.winner?.name}
@@ -234,7 +250,9 @@ export const FinalReport: React.FC = () => {
                 sx={{
                   color: 'rgba(255, 255, 255, 0.9)',
                   fontStyle: 'italic',
-                  mb: 2
+                  mb: 2,
+                  fontFamily: "'Inter', sans-serif",
+                  fontWeight: 500
                 }}
               >
                 "{tournament.winner?.slogan}"
@@ -243,7 +261,8 @@ export const FinalReport: React.FC = () => {
                 variant="h5"
                 sx={{
                   color: 'white',
-                  fontWeight: 'bold'
+                  fontWeight: 600,
+                  fontFamily: "'Inter', sans-serif"
                 }}
               >
                 Pontuação Final: {tournament.winner?.score} pontos
@@ -253,168 +272,221 @@ export const FinalReport: React.FC = () => {
         )}
 
         {/* Tabela de Classificação */}
-        <TableContainer
-          component={Paper}
-          sx={{
+        <TableContainer 
+          component={Paper} 
+          sx={{ 
+            mb: 6,
             borderRadius: 2,
-            boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)',
-            backgroundColor: 'rgba(255, 255, 255, 0.95)'
+            boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)'
           }}
         >
           <Table>
             <TableHead>
-              <TableRow
-                sx={{
-                  backgroundColor: 'rgba(0, 0, 0, 0.03)'
-                }}
-              >
-                <TableCell sx={{ fontWeight: 'bold' }}>Posição</TableCell>
-                <TableCell sx={{ fontWeight: 'bold' }}>Startup</TableCell>
-                <TableCell align="center" sx={{ fontWeight: 'bold' }}>Pontuação</TableCell>
-                <TableCell align="center" sx={{ fontWeight: 'bold' }}>
-                  <Chip
-                    icon={<RocketLaunchIcon />}
-                    label="Pitches"
-                    sx={{
-                      backgroundColor: '#4CAF50',
-                      color: 'white',
-                      '& .MuiSvgIcon-root': { color: 'white' }
-                    }}
-                  />
+              <TableRow>
+                <TableCell 
+                  sx={{ 
+                    fontWeight: 900,
+                    fontFamily: "'Inter', sans-serif",
+                    color: '#FF6B6B'
+                  }}
+                >
+                  Posição
                 </TableCell>
-                <TableCell align="center" sx={{ fontWeight: 'bold' }}>
-                  <Chip
-                    icon={<BugReportIcon />}
-                    label="Bugs"
-                    sx={{
-                      backgroundColor: '#f44336',
-                      color: 'white',
-                      '& .MuiSvgIcon-root': { color: 'white' }
-                    }}
-                  />
+                <TableCell 
+                  sx={{ 
+                    fontWeight: 900,
+                    fontFamily: "'Inter', sans-serif",
+                    color: '#FF6B6B'
+                  }}
+                >
+                  Startup
                 </TableCell>
-                <TableCell align="center" sx={{ fontWeight: 'bold' }}>
-                  <Chip
-                    icon={<TrendingUpIcon />}
-                    label="Tração"
-                    sx={{
-                      backgroundColor: '#2196f3',
-                      color: 'white',
-                      '& .MuiSvgIcon-root': { color: 'white' }
-                    }}
-                  />
+                <TableCell 
+                  sx={{ 
+                    fontWeight: 900,
+                    fontFamily: "'Inter', sans-serif",
+                    color: '#FF6B6B'
+                  }}
+                >
+                  Pontuação
                 </TableCell>
-                <TableCell align="center" sx={{ fontWeight: 'bold' }}>
-                  <Chip
-                    icon={<SentimentVeryDissatisfiedIcon />}
-                    label="Investidor"
-                    sx={{
-                      backgroundColor: '#ff9800',
-                      color: 'white',
-                      '& .MuiSvgIcon-root': { color: 'white' }
-                    }}
-                  />
+                <TableCell 
+                  sx={{ 
+                    fontWeight: 900,
+                    fontFamily: "'Inter', sans-serif",
+                    color: '#FF6B6B'
+                  }}
+                >
+                  Estatísticas
                 </TableCell>
-                <TableCell align="center" sx={{ fontWeight: 'bold' }}>
-                  <Chip
-                    icon={<NewspaperIcon />}
-                    label="Fake News"
-                    sx={{
-                      backgroundColor: '#9c27b0',
-                      color: 'white',
-                      '& .MuiSvgIcon-root': { color: 'white' }
-                    }}
-                  />
+                <TableCell 
+                  sx={{ 
+                    fontWeight: 900,
+                    fontFamily: "'Inter', sans-serif",
+                    color: '#FF6B6B'
+                  }}
+                >
+                  Ações
                 </TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              {sortedStartups.map((startup, index) => {
-                const position = index + 1;
-                const isEliminated = tournament.isCompleted && position > 1;
-                
-                return (
-                  <TableRow 
-                    key={startup.id}
-                    sx={{
-                      '&:nth-of-type(odd)': {
-                        backgroundColor: 'rgba(0, 0, 0, 0.02)',
-                      },
-                      cursor: 'pointer',
-                      '&:hover': {
-                        backgroundColor: 'rgba(0, 0, 0, 0.05)',
-                      },
+              {sortedStartups.map((startup, index) => (
+                <TableRow 
+                  key={startup.id}
+                  sx={{ 
+                    '&:last-child td, &:last-child th': { border: 0 },
+                    backgroundColor: index === 0 ? 'rgba(76, 175, 80, 0.1)' : 'white'
+                  }}
+                >
+                  <TableCell 
+                    sx={{ 
+                      fontWeight: 600,
+                      fontFamily: "'Inter', sans-serif"
                     }}
-                    onClick={() => navigate(`/startup/${startup.id}`)}
                   >
-                    <TableCell>
-                      <Typography 
-                        variant="body1" 
+                    {index + 1}º
+                  </TableCell>
+                  <TableCell>
+                    <Typography 
+                      sx={{ 
+                        fontWeight: 600,
+                        fontFamily: "'Inter', sans-serif"
+                      }}
+                    >
+                      {startup.name}
+                    </Typography>
+                    <Typography 
+                      variant="body2" 
+                      sx={{ 
+                        color: 'text.secondary',
+                        fontFamily: "'Inter', sans-serif",
+                        fontWeight: 500
+                      }}
+                    >
+                      {startup.slogan}
+                    </Typography>
+                  </TableCell>
+                  <TableCell 
+                    sx={{ 
+                      fontWeight: 600,
+                      fontFamily: "'Inter', sans-serif"
+                    }}
+                  >
+                    {startup.score} pts
+                  </TableCell>
+                  <TableCell>
+                    <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+                      <Chip
+                        icon={<RocketLaunchIcon />}
+                        label={`${startup.stats.pitches} Pitches`}
                         sx={{ 
-                          fontWeight: 'bold',
-                          color: tournament.isCompleted ? (position === 1 ? '#4CAF50' : isEliminated ? '#f44336' : 'inherit') : 'inherit'
+                          backgroundColor: 'rgba(76, 175, 80, 0.1)',
+                          color: '#4CAF50',
+                          fontFamily: "'Inter', sans-serif",
+                          fontWeight: 500
                         }}
-                      >
-                        {position}º
-                      </Typography>
-                    </TableCell>
-                    <TableCell>
-                      <Typography 
-                        variant="body1" 
+                      />
+                      <Chip
+                        icon={<BugReportIcon />}
+                        label={`${startup.stats.bugs} Bugs`}
                         sx={{ 
-                          fontWeight: 'bold',
-                          color: tournament.isCompleted ? (position === 1 ? '#4CAF50' : isEliminated ? '#f44336' : 'inherit') : 'inherit'
+                          backgroundColor: 'rgba(244, 67, 54, 0.1)',
+                          color: '#f44336',
+                          fontFamily: "'Inter', sans-serif",
+                          fontWeight: 500
                         }}
-                      >
-                        {startup.name}
-                      </Typography>
-                    </TableCell>
-                    <TableCell align="center">
-                      <Typography 
-                        variant="body1" 
+                      />
+                      <Chip
+                        icon={<TrendingUpIcon />}
+                        label={`${startup.stats.tractions} Trações`}
                         sx={{ 
-                          fontWeight: 'bold',
-                          color: tournament.isCompleted ? (position === 1 ? '#4CAF50' : isEliminated ? '#f44336' : 'inherit') : 'inherit'
+                          backgroundColor: 'rgba(33, 150, 243, 0.1)',
+                          color: '#2196f3',
+                          fontFamily: "'Inter', sans-serif",
+                          fontWeight: 500
                         }}
-                      >
-                        {startup.score} pts
-                      </Typography>
-                    </TableCell>
-                    <TableCell align="center">{startup.stats.pitches}</TableCell>
-                    <TableCell align="center">{startup.stats.bugs}</TableCell>
-                    <TableCell align="center">{startup.stats.tractions}</TableCell>
-                    <TableCell align="center">{startup.stats.angryInvestors}</TableCell>
-                    <TableCell align="center">{startup.stats.fakeNews}</TableCell>
-                  </TableRow>
-                );
-              })}
+                      />
+                      <Chip
+                        icon={<SentimentVeryDissatisfiedIcon />}
+                        label={`${startup.stats.angryInvestors} Investidores Irritados`}
+                        sx={{ 
+                          backgroundColor: 'rgba(255, 152, 0, 0.1)',
+                          color: '#ff9800',
+                          fontFamily: "'Inter', sans-serif",
+                          fontWeight: 500
+                        }}
+                      />
+                      <Chip
+                        icon={<NewspaperIcon />}
+                        label={`${startup.stats.fakeNews} Fake News`}
+                        sx={{ 
+                          backgroundColor: 'rgba(156, 39, 176, 0.1)',
+                          color: '#9c27b0',
+                          fontFamily: "'Inter', sans-serif",
+                          fontWeight: 500
+                        }}
+                      />
+                    </Box>
+                  </TableCell>
+                  <TableCell>
+                    <Button
+                      variant="outlined"
+                      size="small"
+                      startIcon={<InfoIcon />}
+                      onClick={() => navigate(`/startup/${startup.id}`)}
+                      sx={{ 
+                        color: '#FF6B6B',
+                        borderColor: '#FF6B6B',
+                        fontFamily: "'Inter', sans-serif",
+                        fontWeight: 600,
+                        textTransform: 'none',
+                        '&:hover': {
+                          borderColor: '#FF8E53',
+                          backgroundColor: 'rgba(255, 107, 107, 0.04)',
+                        }
+                      }}
+                    >
+                      Mais detalhes
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))}
             </TableBody>
           </Table>
         </TableContainer>
-        <Box sx={{ mt: 4, display: 'flex', justifyContent: 'center' }}>
-  <Button
 
-    variant="contained"
-    onClick={() => {
-      resetTournament();   // limpa store
-      navigate('/');       // redireciona pra página inicial
-    }}
-    sx={{
-      background: 'linear-gradient(135deg, #1976d2 0%, #1565c0 100%)',
-      '&:hover': {
-        background: 'linear-gradient(135deg, #1565c0 0%, #1976d2 100%)',
-      },
-      fontWeight: 'bold',
-      px: 4,
-      py: 1.5,
-      fontSize: '1rem'
-    }}
-  >
-    Iniciar Novo Torneio
-  </Button>
-</Box>
-
-
+        {/* Botão de Novo Torneio - só aparece quando o torneio estiver completo */}
+        {tournament.isCompleted && (
+          <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+            <Button
+              variant="contained"
+              onClick={() => {
+                resetTournament();
+                navigate('/');
+              }}
+              startIcon={<RocketLaunchIcon />}
+              sx={{ 
+                background: 'linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%)',
+                color: 'white',
+                fontWeight: 600,
+                fontSize: '1.1rem',
+                py: 2,
+                px: 5,
+                fontFamily: "'Inter', sans-serif",
+                textTransform: 'none',
+                '&:hover': {
+                  background: 'linear-gradient(135deg, #FF8E53 0%, #FF6B6B 100%)',
+                  transform: 'scale(1.05)',
+                  boxShadow: '0 4px 20px rgba(0, 0, 0, 0.2)'
+                },
+                transition: 'all 0.3s ease'
+              }}
+            >
+              Novo Torneio
+            </Button>
+          </Box>
+        )}
       </Container>
     </Box>
   );

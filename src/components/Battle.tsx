@@ -417,9 +417,25 @@ export default function Battle() {
     id: string;
     startups: Startup[];
   }) => {
+    let tournamentId = "";
+  
+    try {
+      // Cria o torneio no backend
+      const response = await fetch("http://localhost:3001/api/tournaments", {
+        method: "POST",
+      });
+  
+      const data = await response.json();
+      tournamentId = data.id;
+      console.log("🏁 Torneio criado com ID:", tournamentId);
+    } catch (err) {
+      console.error("Erro ao criar torneio:", err);
+      return;
+    }
+  
     const payload = tournament.startups.map((startup: Startup, index: number) => ({
       startupId: startup.id,
-      tournamentId: tournament.id,
+      tournamentId,
       finalPosition: index + 1,
       finalScore: startup.score,
       finalPitches: startup.stats.pitches,
@@ -432,9 +448,7 @@ export default function Battle() {
     try {
       const response = await fetch("http://localhost:3001/api/tournament/finalize", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
   
@@ -444,6 +458,7 @@ export default function Battle() {
       console.error("❌ Erro ao salvar histórico automaticamente:", err);
     }
   };
+  
   
   
 

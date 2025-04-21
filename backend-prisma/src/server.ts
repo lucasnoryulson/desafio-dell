@@ -23,32 +23,6 @@ app.get('/teste', (req, res) => {
   res.send('Servidor está funcionando!');
 });
 
-app.get('/api/startups/:id', async (req, res) => {
-  const { id } = req.params;
-
-  try {
-    const startup = await prisma.startup.findUnique({
-      where: { id },
-      include: {
-        participations: true,
-      },
-    });
-
-    if (!startup) {
-      return res.status(404).json({ error: 'Startup não encontrada' });
-    }
-
-    res.status(200).json(startup);
-  } catch (error) {
-    console.error('Erro ao buscar startup por ID:', error);
-    res.status(500).json({ error: 'Erro interno do servidor' });
-  }
-});
-
-
-
-
-
 
 // Rota para criar uma startup
 app.post('/api/startups', async (req: Request, res: Response) => {
@@ -228,6 +202,34 @@ app.post('/api/tournaments', async (_req: Request, res: Response) => {
     res.status(500).json({ error: 'Erro ao criar torneio' });
   }
 });
+
+// Rota para buscar participações de uma startup por ID
+app.get('/api/startups/:id/participations', async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const participations = await prisma.tournamentParticipation.findMany({
+      where: {
+        startupId: id,
+        finalPosition: {
+          not: null // ← Apenas participações finalizadas
+        }
+      },
+      orderBy: {
+        finalPosition: 'asc'
+      },
+      include: {
+        tournament: true // ← caso queira usar dados do torneio no front
+      }
+    });
+
+    res.json(participations);
+  } catch (error) {
+    console.error('Erro ao buscar participações da startup:', error);
+    res.status(500).json({ error: 'Erro interno ao buscar histórico de participações' });
+  }
+});
+
 
 const PORT = process.env.PORT || 3001;
 

@@ -49,17 +49,18 @@ export const TournamentBracket: React.FC = () => {
 
   const renderStartupCard = (startup: Startup, pts: number, isWinner: boolean = false) => (
     <Paper
-      elevation={2}
+      elevation={3}
       sx={{
         p: isFourStartups ? 2 : 1,
         mb: 1,
         backgroundColor: isWinner ? '#4CAF50' : '#FF6B6B',
         color: 'white',
-        borderRadius: 1,
+        borderRadius: 2,
         cursor: 'pointer',
-        transition: 'transform 0.2s',
+        transition: 'all 0.3s ease',
         '&:hover': {
           transform: 'scale(1.02)',
+          boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
         },
         minHeight: isFourStartups ? '50px' : '40px',
         display: 'flex',
@@ -67,10 +68,22 @@ export const TournamentBracket: React.FC = () => {
         justifyContent: 'space-between'
       }}
     >
-      <Typography variant={isFourStartups ? "body1" : "body2"} sx={{ fontWeight: 'bold' }}>
+      <Typography 
+        variant={isFourStartups ? "body1" : "body2"} 
+        sx={{ 
+          fontWeight: 600,
+          fontFamily: "'Inter', sans-serif"
+        }}
+      >
         {startup.name}
       </Typography>
-      <Typography variant={isFourStartups ? "body1" : "body2"}>
+      <Typography 
+        variant={isFourStartups ? "body1" : "body2"}
+        sx={{ 
+          fontWeight: 500,
+          fontFamily: "'Inter', sans-serif"
+        }}
+      >
         {startup.score} pts
       </Typography>
     </Paper>
@@ -82,10 +95,14 @@ export const TournamentBracket: React.FC = () => {
       sx={{
         p: isFourStartups ? 3 : 2,
         mb: 2,
-        backgroundColor: 'rgba(255, 255, 255, 0.95)',
+        backgroundColor: 'white',
         borderRadius: 2,
         width: '100%',
-        maxWidth: isFourStartups ? '400px' : '300px'
+        maxWidth: isFourStartups ? '400px' : '300px',
+        transition: 'all 0.3s ease',
+        '&:hover': {
+          boxShadow: '0 8px 24px rgba(0,0,0,0.15)',
+        },
       }}
     >
       <Box sx={{ mb: 1 }}>
@@ -98,7 +115,10 @@ export const TournamentBracket: React.FC = () => {
           <Typography 
             variant={isFourStartups ? "h6" : "subtitle2"} 
             color="#FF6B6B" 
-            sx={{ fontWeight: 'bold' }}
+            sx={{ 
+              fontWeight: 900,
+              fontFamily: "'Inter', sans-serif"
+            }}
           >
             {getRoundName(battle.round)}
           </Typography>
@@ -108,9 +128,14 @@ export const TournamentBracket: React.FC = () => {
               variant="contained"
               sx={{ 
                 background: 'linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%)',
+                color: 'white',
+                boxShadow: '0 3px 5px 2px rgba(255, 107, 107, .3)',
                 '&:hover': {
                   background: 'linear-gradient(135deg, #FF8E53 0%, #FF6B6B 100%)',
-                }
+                },
+                fontFamily: "'Inter', sans-serif",
+                fontWeight: 600,
+                textTransform: 'none'
               }}
               onClick={() => handleBattleClick(battle.id)}
             >
@@ -130,7 +155,8 @@ export const TournamentBracket: React.FC = () => {
             display: 'flex', 
             alignItems: 'center', 
             color: '#4CAF50',
-            fontWeight: 'bold' 
+            fontWeight: 600,
+            fontFamily: "'Inter', sans-serif"
           }}
         >
           <EmojiEventsIcon sx={{ fontSize: isFourStartups ? 20 : 16, mr: 0.5 }} />
@@ -146,7 +172,7 @@ export const TournamentBracket: React.FC = () => {
         minHeight: '100vh',
         width: '100%',
         overflowX: 'hidden',
-        background: 'linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%)',
+        backgroundColor: 'white',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
@@ -173,10 +199,12 @@ export const TournamentBracket: React.FC = () => {
           component="h1" 
           align="center" 
           sx={{ 
-            color: 'white',
+            color: '#FF6B6B',
             mb: 6,
-            fontWeight: 'bold',
-            textShadow: '2px 2px 4px rgba(0,0,0,0.2)'
+            fontWeight: 900,
+            fontFamily: "'Inter', sans-serif",
+            fontSize: { xs: '2rem', sm: '2.5rem', md: '3rem' },
+            letterSpacing: '-0.02em'
           }}
         >
           Chaveamento do Torneio
@@ -199,10 +227,10 @@ export const TournamentBracket: React.FC = () => {
                 variant="h6" 
                 align="center" 
                 sx={{ 
-                  color: 'white',
+                  color: '#FF6B6B',
                   mb: 4,
-                  fontWeight: 'bold',
-                  textShadow: '1px 1px 2px rgba(0,0,0,0.2)'
+                  fontWeight: 900,
+                  fontFamily: "'Inter', sans-serif"
                 }}
               >
                 Quartas de Final
@@ -222,10 +250,10 @@ export const TournamentBracket: React.FC = () => {
               variant="h6" 
               align="center" 
               sx={{ 
-                color: 'white',
+                color: '#FF6B6B',
                 mb: 4,
-                fontWeight: 'bold',
-                textShadow: '1px 1px 2px rgba(0,0,0,0.2)'
+                fontWeight: 900,
+                fontFamily: "'Inter', sans-serif"
               }}
             >
               Semifinais
@@ -244,10 +272,10 @@ export const TournamentBracket: React.FC = () => {
               variant="h6" 
               align="center" 
               sx={{ 
-                color: 'white',
+                color: '#FF6B6B',
                 mb: 4,
-                fontWeight: 'bold',
-                textShadow: '1px 1px 2px rgba(0,0,0,0.2)'
+                fontWeight: 900,
+                fontFamily: "'Inter', sans-serif"
               }}
             >
               Final
@@ -274,21 +302,17 @@ export const TournamentBracket: React.FC = () => {
             <Button
               variant="contained"
               size="large"
-              onClick={() => {
-                console.log('Navigating to final report', { 
-                  tournamentExists: !!tournament, 
-                  isCompleted: tournament?.isCompleted 
-                });
-                navigate('/report');
-              }}
+              onClick={() => navigate('/report')}
               startIcon={<AssessmentIcon />}
               sx={{ 
                 background: 'linear-gradient(135deg, #4CAF50 0%, #45a049 100%)',
                 color: 'white',
-                fontWeight: 'bold',
-                fontSize: '1.2rem',
+                fontWeight: 600,
+                fontSize: '1.1rem',
                 py: 2,
                 px: 5,
+                fontFamily: "'Inter', sans-serif",
+                textTransform: 'none',
                 '&:hover': {
                   background: 'linear-gradient(135deg, #45a049 0%, #4CAF50 100%)',
                   transform: 'scale(1.05)',

@@ -1,184 +1,281 @@
 import React, { useEffect, useState } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import {
   Box,
   Container,
   Typography,
   Paper,
-  Button,
   Grid,
   Chip,
+  Button,
   Card,
   CardContent,
   Divider,
-  CircularProgress,
+  IconButton,
 } from '@mui/material';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useTournamentStore } from '../store/tournamentStore';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
 import RocketLaunchIcon from '@mui/icons-material/RocketLaunch';
 import BugReportIcon from '@mui/icons-material/BugReport';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import SentimentVeryDissatisfiedIcon from '@mui/icons-material/SentimentVeryDissatisfied';
 import NewspaperIcon from '@mui/icons-material/Newspaper';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
-
-// ...importações mantidas como estão
+import HistoryIcon from '@mui/icons-material/History';
+import StarIcon from '@mui/icons-material/Star';
+import MilitaryTechIcon from '@mui/icons-material/MilitaryTech';
+import InfoIcon from '@mui/icons-material/Info';
 
 export const StartupDetails: React.FC = () => {
   const { startupId } = useParams<{ startupId: string }>();
   const navigate = useNavigate();
-
-  const [startup, setStartup] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
+  const { tournament } = useTournamentStore();
+  const [history, setHistory] = useState<any[]>([]);
 
   useEffect(() => {
-    const fetchStartup = async () => {
-      try {
-        const res = await fetch(`http://localhost:3001/api/startups/${startupId}`);
-        const data = await res.json();
-        setStartup(data);
-      } catch (err) {
-        console.error('Erro ao carregar startup', err);
-      } finally {
-        setLoading(false);
-      }
-    };
+    if (!startupId) return;
 
-    if (startupId) fetchStartup();
+    fetch(`http://localhost:3001/api/startups/${startupId}/participations`)
+      .then(res => res.json())
+      .then(data => setHistory(data))
+      .catch(err => console.error("Erro ao carregar histórico:", err));
   }, [startupId]);
 
-  if (loading) {
-    return (
-      <Box display="flex" justifyContent="center" alignItems="center" height="100vh">
-        <CircularProgress />
-      </Box>
-    );
-  }
+  const startup = tournament?.startups.find(s => s.id === startupId);
 
   if (!startup) {
     return (
-      <Box p={3}>
-        <Typography variant="h5" color="error">Startup não encontrada</Typography>
+      <Box
+        sx={{
+          minHeight: '100vh',
+          width: '100%',
+          backgroundColor: 'white',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center'
+        }}
+      >
+        <Typography 
+          variant="h5" 
+          sx={{ 
+            color: '#FF6B6B', 
+            textAlign: 'center', 
+            mb: 2,
+            fontFamily: "'Inter', sans-serif",
+            fontWeight: 600
+          }}
+        >
+          Startup não encontrada
+        </Typography>
+        <Button
+          variant="contained"
+          onClick={() => navigate('/')}
+          sx={{ 
+            background: 'linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%)',
+            color: 'white',
+            fontFamily: "'Inter', sans-serif",
+            fontWeight: 600,
+            textTransform: 'none',
+            '&:hover': {
+              background: 'linear-gradient(135deg, #FF8E53 0%, #FF6B6B 100%)',
+            }
+          }}
+        >
+          Voltar para o Início
+        </Button>
       </Box>
     );
   }
+
+  const getPositionColor = (position: number) => {
+    switch (position) {
+      case 1:
+        return '#FFD700';
+      case 2:
+        return '#C0C0C0';
+      case 3:
+        return '#CD7F32';
+      default:
+        return '#FF6B6B';
+    }
+  };
+
+  const getPositionIcon = (position: number) => {
+    switch (position) {
+      case 1:
+        return <EmojiEventsIcon />;
+      case 2:
+        return <MilitaryTechIcon />;
+      case 3:
+        return <StarIcon />;
+      default:
+        return null;
+    }
+  };
 
   return (
     <Box
       sx={{
         minHeight: '100vh',
         width: '100%',
-        overflowX: 'hidden',
-        background: 'linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%)',
-        py: 4
+        backgroundColor: 'white',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        position: 'relative',
       }}
     >
-      <Container maxWidth="lg">
-        <Button
-          variant="contained"
-          startIcon={<ArrowBackIcon />}
-          onClick={() => navigate(-1)}
-          sx={{ mb: 4, backgroundColor: 'rgba(255,255,255,0.9)', color: '#FF6B6B' }}
-        >
-          Voltar
-        </Button>
+      <Container maxWidth="lg" sx={{ py: 4 }}>
+        {/* Botão Voltar */}
+        <Box sx={{ mb: 4, display: 'flex', alignItems: 'center' }}>
+          <IconButton
+            onClick={() => navigate(-1)}
+            sx={{ 
+              color: '#FF6B6B',
+              '&:hover': { color: '#FF8E53' }
+            }}
+          >
+            <ArrowBackIcon />
+          </IconButton>
+          <Typography 
+            variant="h6" 
+            sx={{ 
+              ml: 1,
+              color: '#FF6B6B',
+              fontFamily: "'Inter', sans-serif",
+              fontWeight: 600
+            }}
+          >
+            Voltar
+          </Typography>
+        </Box>
 
-        <Typography variant="h3" sx={{ color: 'white', mb: 4, fontWeight: 'bold' }}>
-          Detalhes
-        </Typography>
-
-        <Grid container spacing={4}>
-          {/* Info Principal */}
-          <Grid item xs={12} md={8}>
-            <Card sx={{ borderRadius: 2 }}>
-              <CardContent>
-                <Typography variant="h4" sx={{ color: '#FF6B6B', fontWeight: 'bold' }}>
-                  {startup.name}
-                </Typography>
-                <Typography variant="h6" sx={{ color: 'text.secondary', fontStyle: 'italic', mb: 2 }}>
+        {/* Cabeçalho da Startup */}
+        <Card sx={{ mb: 4, borderRadius: 2, boxShadow: 3 }}>
+          <CardContent sx={{ p: 4 }}>
+            <Grid container spacing={3}>
+              <Grid item xs={12} md={8}>
+                <Typography variant="h3" sx={{ color: '#FF6B6B', fontWeight: 900 }}>{startup.name}</Typography>
+                <Typography variant="h6" sx={{ fontStyle: 'italic', color: 'text.secondary' }}>
                   "{startup.slogan}"
                 </Typography>
-                <Typography variant="body1" paragraph>
-                  Ano de Fundação: {startup.foundingYear}
+                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mt: 2 }}>
+                  <Chip icon={<RocketLaunchIcon />} label={`${startup.stats.pitches} Pitches`} />
+                  <Chip icon={<BugReportIcon />} label={`${startup.stats.bugs} Bugs`} />
+                  <Chip icon={<TrendingUpIcon />} label={`${startup.stats.tractions} Trações`} />
+                  <Chip icon={<SentimentVeryDissatisfiedIcon />} label={`${startup.stats.angryInvestors} Investidores`} />
+                  <Chip icon={<NewspaperIcon />} label={`${startup.stats.fakeNews} Fake News`} />
+                </Box>
+              </Grid>
+              <Grid item xs={12} md={4} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <Typography variant="h4" sx={{ color: '#FF6B6B', fontWeight: 900 }}>
+                  {startup.score} pts
                 </Typography>
-                <Typography variant="h6" gutterBottom>Descrição</Typography>
-                <Typography variant="body1" paragraph>
-                  {startup.description || 'Nenhuma descrição disponível'}
-                </Typography>
-                <Divider sx={{ my: 2 }} />
-                <Typography variant="h6" gutterBottom>Estatísticas Atuais</Typography>
-                <Grid container spacing={2}>
-                  <Grid item><Chip icon={<RocketLaunchIcon />} label={`Pitches: ${startup.pitches}`} sx={{ backgroundColor: '#4CAF50', color: 'white' }} /></Grid>
-                  <Grid item><Chip icon={<BugReportIcon />} label={`Bugs: ${startup.bugs}`} sx={{ backgroundColor: '#f44336', color: 'white' }} /></Grid>
-                  <Grid item><Chip icon={<TrendingUpIcon />} label={`Tração: ${startup.tractions}`} sx={{ backgroundColor: '#2196f3', color: 'white' }} /></Grid>
-                  <Grid item><Chip icon={<SentimentVeryDissatisfiedIcon />} label={`Investidor: ${startup.angryInvestors}`} sx={{ backgroundColor: '#ff9800', color: 'white' }} /></Grid>
-                  <Grid item><Chip icon={<NewspaperIcon />} label={`Fake News: ${startup.fakeNews}`} sx={{ backgroundColor: '#9c27b0', color: 'white' }} /></Grid>
-                </Grid>
-              </CardContent>
-            </Card>
-          </Grid>
+              </Grid>
+            </Grid>
+          </CardContent>
+        </Card>
 
-          {/* Histórico */}
-          <Grid item xs={12}>
-            <Card>
-              <CardContent>
-                <Typography variant="h5" fontWeight="bold" gutterBottom>
-                  Histórico de Participações
+        {/* Detalhes */}
+        <Card sx={{ mb: 4, borderRadius: 2, boxShadow: 3 }}>
+          <CardContent sx={{ p: 4 }}>
+            <Typography variant="h5" sx={{ color: '#FF6B6B', fontWeight: 900, mb: 2 }}>
+              <InfoIcon /> Detalhes da Startup
+            </Typography>
+            <Grid container spacing={3}>
+              <Grid item xs={12} md={6}>
+                <Typography variant="body1" color="text.secondary">Ano de Fundação</Typography>
+                <Typography variant="h6">{startup.foundingYear}</Typography>
+              </Grid>
+              <Grid item xs={12}>
+                <Typography variant="body1" color="text.secondary">Descrição</Typography>
+                <Typography variant="body2">
+                  {startup.description || "Nenhuma descrição disponível."}
                 </Typography>
-                {startup.participations?.length > 0 ? (
-                  startup.participations.map((p: any, index: number) => {
-                    const isGold = p.finalPosition === 1;
-                    const isSilver = p.finalPosition === 2;
+              </Grid>
+            </Grid>
+          </CardContent>
+        </Card>
 
-                    return (
+        {/* Histórico */}
+        <Card sx={{ borderRadius: 2, boxShadow: 3 }}>
+          <CardContent sx={{ p: 4 }}>
+            <Typography variant="h5" sx={{ color: '#FF6B6B', fontWeight: 900, mb: 2 }}>
+              <HistoryIcon /> Histórico de Participações
+            </Typography>
+
+            {history.length > 0 ? (
+              <Grid container spacing={3}>
+                {history.map((entry, index) => (
+                  <Grid item xs={12} key={index}>
+                    <Paper
+                      elevation={0}
+                      sx={{
+                        p: 3,
+                        borderRadius: 2,
+                        backgroundColor: 'rgba(255, 107, 107, 0.04)',
+                        border: `2px solid ${getPositionColor(entry.finalPosition)}`,
+                        position: 'relative'
+                      }}
+                    >
                       <Box
-                        key={p.id}
                         sx={{
-                          border: `1px solid ${isGold ? '#FFD700' : isSilver ? '#C0C0C0' : '#ddd'}`,
-                          backgroundColor: isGold
-                            ? 'rgba(255,215,0,0.1)'
-                            : isSilver
-                              ? 'rgba(192,192,192,0.1)'
-                              : '#f9f9f9',
-                          borderRadius: 2,
-                          p: 2,
-                          mb: 3,
-                          transition: 'transform 0.2s ease-in-out',
-                          '&:hover': {
-                            transform: 'scale(1.02)',
-                          }
+                          position: 'absolute',
+                          top: -15,
+                          left: 20,
+                          backgroundColor: 'white',
+                          px: 2,
+                          py: 0.5,
+                          borderRadius: 1,
+                          border: `2px solid ${getPositionColor(entry.finalPosition)}`,
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 1
                         }}
                       >
-                        <Box display="flex" alignItems="center" mb={1}>
-                          {isGold || isSilver ? (
-                            <EmojiEventsIcon sx={{ color: isGold ? '#FFD700' : '#C0C0C0', mr: 1 }} />
-                          ) : null}
-                          <Typography variant="h6" fontWeight="bold">
-                            Edição {index + 1} • {p.finalPosition}º lugar
-                          </Typography>
-                        </Box>
-                        <Typography variant="body2" sx={{ fontStyle: 'italic', mb: 1 }}>
-                          Participação em: {new Date(p.createdAt).toLocaleDateString('pt-BR')}
+                        {getPositionIcon(entry.finalPosition)}
+                        <Typography sx={{ color: getPositionColor(entry.finalPosition), fontWeight: 700 }}>
+                          Edição #{entry.tournamentId.slice(0, 5)}
                         </Typography>
-                        <Typography variant="body1" mb={1}>
-                          Pontuação: {p.finalScore}
-                        </Typography>
-                        <Grid container spacing={1}>
-                          <Grid item><Chip size="small" icon={<RocketLaunchIcon />} label={`Pitches: ${p.finalPitches}`} /></Grid>
-                          <Grid item><Chip size="small" icon={<BugReportIcon />} label={`Bugs: ${p.finalBugs}`} /></Grid>
-                          <Grid item><Chip size="small" icon={<TrendingUpIcon />} label={`Tração: ${p.finalTractions}`} /></Grid>
-                          <Grid item><Chip size="small" icon={<SentimentVeryDissatisfiedIcon />} label={`Investidores Irritados: ${p.finalAngryInvestors}`} /></Grid>
-                          <Grid item><Chip size="small" icon={<NewspaperIcon />} label={`Fake News: ${p.finalFakeNews}`} /></Grid>
-                        </Grid>
                       </Box>
-                    );
-                  })
-                ) : (
-                  <Typography align="center">Nenhuma participação anterior</Typography>
-                )}
-              </CardContent>
-            </Card>
-          </Grid>
-        </Grid>
+
+                      <Grid container spacing={2} sx={{ mt: 2 }}>
+                        <Grid item xs={12} sm={6}>
+                          <Typography color="text.secondary">Posição Final</Typography>
+                          <Typography sx={{ fontWeight: 700 }}>
+                            {entry.finalPosition}º lugar
+                          </Typography>
+                        </Grid>
+                        <Grid item xs={12} sm={6}>
+                          <Typography color="text.secondary">Pontuação Final</Typography>
+                          <Typography sx={{ fontWeight: 700 }}>
+                            {entry.finalScore} pontos
+                          </Typography>
+                        </Grid>
+                        <Grid item xs={12}>
+                          <Divider sx={{ my: 2 }} />
+                          <Typography color="text.secondary" sx={{ mb: 1 }}>Estatísticas Finais</Typography>
+                          <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+                            <Chip icon={<RocketLaunchIcon />} label={`${entry.finalPitches} Pitches`} />
+                            <Chip icon={<BugReportIcon />} label={`${entry.finalBugs} Bugs`} />
+                            <Chip icon={<TrendingUpIcon />} label={`${entry.finalTractions} Trações`} />
+                            <Chip icon={<SentimentVeryDissatisfiedIcon />} label={`${entry.finalAngryInvestors} Investidores Irritados`} />
+                            <Chip icon={<NewspaperIcon />} label={`${entry.finalFakeNews} Fake News`} />
+                          </Box>
+                        </Grid>
+                      </Grid>
+                    </Paper>
+                  </Grid>
+                ))}
+              </Grid>
+            ) : (
+              <Typography color="text.secondary" sx={{ py: 4, textAlign: 'center' }}>
+                Esta startup ainda não participou de nenhum torneio anterior.
+              </Typography>
+            )}
+          </CardContent>
+        </Card>
       </Container>
     </Box>
   );

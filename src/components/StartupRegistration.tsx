@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   Button,
@@ -16,11 +16,15 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
+  Card,
+  CardContent,
+  IconButton,
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { useTournamentStore } from '../store/tournamentStore';
 import { Startup } from '../types';
 import RocketLaunchIcon from '@mui/icons-material/RocketLaunch';
+import CloseIcon from '@mui/icons-material/Close';
 
 const API_URL = 'http://localhost:3001/api';
 
@@ -33,8 +37,9 @@ export const StartupRegistration: React.FC = () => {
   const [success, setSuccess] = useState(false);
   const [existingStartup, setExistingStartup] = useState<Startup | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [startups, setStartups] = useState<Startup[]>([]);
   
-  const { tournament, addStartup, startTournament } = useTournamentStore();
+  const { tournament, addStartup, startTournament, removeStartup } = useTournamentStore();
   const navigate = useNavigate();
 
   const checkExistingStartup = async (startupName: string) => {
@@ -136,6 +141,12 @@ export const StartupRegistration: React.FC = () => {
     startTournament();
     navigate('/tournament');
   };
+
+  useEffect(() => {
+    if (tournament) {
+      setStartups(tournament.startups);
+    }
+  }, [tournament]);
 
   return (
     <Box
@@ -296,52 +307,52 @@ export const StartupRegistration: React.FC = () => {
 
           {tournament?.startups.length ? (
             <>
-              <List sx={{ mb: 4 }}>
-                {tournament.startups.map((startup) => (
-                  <Paper
-                    key={startup.id}
-                    elevation={0}
-                    sx={{
-                      mb: 2,
-                      p: 2,
-                      borderRadius: 2,
-                      border: '1px solid rgba(0,0,0,0.1)',
-                      transition: 'transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out',
-                      '&:hover': {
-                        transform: 'translateY(-2px)',
-                        boxShadow: '0 4px 10px rgba(0,0,0,0.1)',
-                      },
-                    }}
-                  >
-                    <Typography
-                      variant="h6"
-                      sx={{
-                        fontWeight: 600,
-                        color: '#1a1a1a',
-                        mb: 0.5,
-                      }}
-                    >
-                      {startup.name}
-                    </Typography>
-                    <Typography
-                      variant="body2"
-                      sx={{
-                        color: '#666',
-                        fontStyle: 'italic',
-                        mb: 1,
-                      }}
-                    >
-                      {startup.slogan}
-                    </Typography>
-                    <Typography
-                      variant="caption"
-                      sx={{ color: '#999' }}
-                    >
-                      Fundada em {startup.foundingYear}
-                    </Typography>
-                  </Paper>
-                ))}
-              </List>
+              <Box sx={{ mt: 4 }}>
+                <Typography variant="h6" sx={{ mb: 2, fontFamily: "'Inter', sans-serif", fontWeight: 600 }}>
+                  Startups Participantes ({tournament.startups.length}/8)
+                </Typography>
+                <Grid container spacing={2}>
+                  {tournament.startups.map((startup, index) => (
+                    <Grid item xs={12} sm={6} md={4} key={startup.id}>
+                      <Card 
+                        sx={{ 
+                          position: 'relative',
+                          '&:hover .remove-button': {
+                            opacity: 1,
+                            color: '#FF6B6B'
+                          }
+                        }}
+                      >
+                        <IconButton
+                          className="remove-button"
+                          size="small"
+                          onClick={() => removeStartup(startup.id)}
+                          sx={{
+                            position: 'absolute',
+                            top: 8,
+                            right: 8,
+                            opacity: 0.3,
+                            transition: 'all 0.2s ease',
+                            '&:hover': {
+                              backgroundColor: 'rgba(255, 107, 107, 0.1)'
+                            }
+                          }}
+                        >
+                          <CloseIcon fontSize="small" />
+                        </IconButton>
+                        <CardContent>
+                          <Typography variant="h6" sx={{ fontFamily: "'Inter', sans-serif", fontWeight: 600 }}>
+                            {startup.name}
+                          </Typography>
+                          <Typography variant="body2" color="text.secondary" sx={{ fontStyle: 'italic', mt: 1 }}>
+                            "{startup.slogan}"
+                          </Typography>
+                        </CardContent>
+                      </Card>
+                    </Grid>
+                  ))}
+                </Grid>
+              </Box>
 
               <Button
                 variant="contained"

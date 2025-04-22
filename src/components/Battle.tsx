@@ -311,9 +311,10 @@ export default function Battle() {
         sx={{
           p: 3,
           cursor: battle.isCompleted ? 'default' : 'pointer',
-          backgroundColor: isSelected ? 'rgba(255, 255, 255, 0.95)' : 'white',
+          backgroundColor: isSelected ? 'rgba(255, 107, 107, 0.05)' : 'white',
           borderRadius: 2,
           transition: 'all 0.2s',
+          border: isSelected ? '2px solid #FF6B6B' : '1px solid rgba(0, 0, 0, 0.12)',
           '&:hover': {
             transform: !battle.isCompleted ? 'scale(1.02)' : 'none',
             boxShadow: !battle.isCompleted ? '0 8px 24px rgba(0,0,0,0.15)' : undefined
@@ -324,8 +325,9 @@ export default function Battle() {
           variant="h5" 
           gutterBottom 
           sx={{ 
-            fontWeight: 'bold',
+            fontWeight: 900,
             color: '#FF6B6B',
+            fontFamily: "'Inter', sans-serif",
             cursor: 'pointer'
           }}
           onClick={(e) => {
@@ -336,19 +338,29 @@ export default function Battle() {
           {startup.name}
         </Typography>
 
-        <Typography variant="body1" paragraph sx={{ color: 'text.secondary', fontStyle: 'italic' }}>
+        <Typography variant="body1" paragraph sx={{ 
+          color: 'text.secondary', 
+          fontStyle: 'italic',
+          fontFamily: "'Inter', sans-serif",
+          fontWeight: 500
+        }}>
           "{startup.slogan}"
         </Typography>
 
         <Typography variant="h6" sx={{ 
           color: '#FF6B6B', 
-          fontWeight: 'bold',
-          mb: 2
+          fontWeight: 600,
+          mb: 2,
+          fontFamily: "'Inter', sans-serif"
         }}>
           {startup.score} pts
         </Typography>
 
-        <Typography variant="subtitle2" gutterBottom sx={{ color: '#666' }}>
+        <Typography variant="subtitle2" gutterBottom sx={{ 
+          color: '#666',
+          fontFamily: "'Inter', sans-serif",
+          fontWeight: 500
+        }}>
           Eventos:
         </Typography>
         <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mb: 2 }}>
@@ -400,7 +412,8 @@ export default function Battle() {
             sx={{
               background: 'linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%)',
               color: 'white',
-              fontWeight: 'bold',
+              fontWeight: 600,
+              fontFamily: "'Inter', sans-serif",
               '&:hover': {
                 background: 'linear-gradient(135deg, #FF8E53 0%, #FF6B6B 100%)',
               }
@@ -547,36 +560,24 @@ export default function Battle() {
       sx={{
         minHeight: '100vh',
         width: '100%',
-        overflowX: 'hidden',
-        background: 'linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%)',
+        backgroundColor: 'white',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0
+        position: 'relative',
       }}
     >
-      <Container 
-        maxWidth="lg" 
-        sx={{ 
-          flex: 1, 
-          display: 'flex', 
-          flexDirection: 'column',
-          py: 4
-        }}
-      >
+      <Container maxWidth="lg" sx={{ py: 4 }}>
         <Typography 
           variant="h3" 
           component="h1" 
           align="center" 
           sx={{ 
-            color: 'white',
+            color: '#FF6B6B',
             mb: 6,
-            fontWeight: 'bold',
-            textShadow: '2px 2px 4px rgba(0,0,0,0.2)'
+            fontWeight: 900,
+            fontFamily: "'Inter', sans-serif",
+            letterSpacing: '-0.02em'
           }}
         >
           {getRoundName(battle.round)}
@@ -588,18 +589,19 @@ export default function Battle() {
             sx={{ 
               mb: 4,
               p: 3,
-              backgroundColor: 'rgba(255, 152, 0, 0.9)',
+              backgroundColor: 'rgba(255, 107, 107, 0.1)',
               borderRadius: 2,
               textAlign: 'center',
-              animation: 'pulse 1.5s infinite'
+              animation: 'pulse 1.5s infinite',
+              border: '2px solid #FF6B6B'
             }}
           >
             <Typography 
               variant="h4" 
               sx={{ 
-                color: 'white',
-                fontWeight: 'bold',
-                textShadow: '1px 1px 2px rgba(0,0,0,0.3)',
+                color: '#FF6B6B',
+                fontWeight: 900,
+                fontFamily: "'Inter', sans-serif",
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -611,9 +613,10 @@ export default function Battle() {
             <Typography 
               variant="h6" 
               sx={{ 
-                color: 'white',
+                color: '#FF6B6B',
                 mt: 1,
-                textShadow: '1px 1px 2px rgba(0,0,0,0.2)'
+                fontFamily: "'Inter', sans-serif",
+                fontWeight: 600
               }}
             >
               Empate! Os tubarões decidirão o vencedor!
@@ -644,14 +647,15 @@ export default function Battle() {
             onClick={handleCompleteBattle}
             startIcon={<EmojiEventsIcon />}
             sx={{ 
-              background: 'linear-gradient(135deg, #4CAF50 0%, #45a049 100%)',
+              background: 'linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%)',
               color: 'white',
-              fontWeight: 'bold',
+              fontWeight: 600,
               fontSize: '1.1rem',
+              fontFamily: "'Inter', sans-serif",
               py: 1.5,
               px: 4,
               '&:hover': {
-                background: 'linear-gradient(135deg, #45a049 0%, #4CAF50 100%)',
+                background: 'linear-gradient(135deg, #FF8E53 0%, #FF6B6B 100%)',
               }
             }}
           >
@@ -666,7 +670,7 @@ export default function Battle() {
         {`
           @keyframes pulse {
             0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
+            50% { transform: scale(1.02); }
             100% { transform: scale(1); }
           }
         `}

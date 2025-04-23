@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useTournamentStore } from '../store/tournamentStore';
 import {
   Box,
   Container,
@@ -12,8 +13,8 @@ import {
   CardContent,
   Divider,
   IconButton,
+  TextField,
 } from '@mui/material';
-import { useTournamentStore } from '../store/tournamentStore';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
 import RocketLaunchIcon from '@mui/icons-material/RocketLaunch';
@@ -22,15 +23,32 @@ import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import SentimentVeryDissatisfiedIcon from '@mui/icons-material/SentimentVeryDissatisfied';
 import NewspaperIcon from '@mui/icons-material/Newspaper';
 import HistoryIcon from '@mui/icons-material/History';
-import StarIcon from '@mui/icons-material/Star';
-import MilitaryTechIcon from '@mui/icons-material/MilitaryTech';
 import InfoIcon from '@mui/icons-material/Info';
+import EditIcon from '@mui/icons-material/Edit';
+import SaveIcon from '@mui/icons-material/Save';
+import CancelIcon from '@mui/icons-material/Cancel';
 
 export const StartupDetails: React.FC = () => {
   const { startupId } = useParams<{ startupId: string }>();
   const navigate = useNavigate();
   const { tournament } = useTournamentStore();
   const [history, setHistory] = useState<any[]>([]);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedName, setEditedName] = useState('');
+  const [editedSlogan, setEditedSlogan] = useState('');
+  const [editedDescription, setEditedDescription] = useState('');
+  const [localStartup, setLocalStartup] = useState<any>(null);
+  const { updateStartup } = useTournamentStore(); 
+  const startup = localStartup || tournament?.startups.find(s => s.id === startupId);
+
+  useEffect(() => {
+    if (startup) {
+      setEditedName(startup.name);
+      setEditedSlogan(startup.slogan);
+      setEditedDescription(startup.description || '');
+      setLocalStartup(startup);
+    }
+  }, [startup]);
 
   useEffect(() => {
     if (!startupId) return;
@@ -41,7 +59,64 @@ export const StartupDetails: React.FC = () => {
       .catch(err => console.error("Erro ao carregar histórico:", err));
   }, [startupId]);
 
-  const startup = tournament?.startups.find(s => s.id === startupId);
+  const handleSave = async () => {
+    if (!startupId) return;
+  
+    try {
+      const response = await fetch(`http://localhost:3001/api/startups/${startupId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: editedName,
+          slogan: editedSlogan,
+          description: editedDescription,
+        }),
+      });
+  
+      if (!response.ok) {
+        console.error('Erro ao atualizar startup');
+        return;
+      }
+  
+      const updatedStartup = await response.json();
+  
+      // ✅ Preserva o stats da versão antiga
+      const currentStats = startup?.stats;
+  
+      const fullStartupWithStats = {
+        ...updatedStartup,
+        stats: currentStats, // ← preserva os dados visíveis no front
+      };
+  
+      setLocalStartup(fullStartupWithStats);
+  
+      // ✅ Atualiza também o store
+      const updateInStore = useTournamentStore.getState().setTournament;
+      const currentTournament = useTournamentStore.getState().tournament;
+  
+      if (currentTournament) {
+        const updatedStartups = currentTournament.startups.map(s =>
+          s.id === updatedStartup.id ? fullStartupWithStats : s
+        );
+  
+        updateInStore({ ...currentTournament, startups: updatedStartups });
+      }
+  
+      setIsEditing(false);
+    } catch (error) {
+      console.error('Erro ao salvar alterações:', error);
+    }
+  };
+  
+  
+  const handleCancel = () => {
+    if (startup) {
+      setEditedName(startup.name);
+      setEditedSlogan(startup.slogan);
+      setEditedDescription(startup.description || '');
+    }
+    setIsEditing(false);
+  };
 
   if (!startup) {
     return (
@@ -106,9 +181,9 @@ export const StartupDetails: React.FC = () => {
       case 1:
         return <EmojiEventsIcon />;
       case 2:
-        return <MilitaryTechIcon />;
+        return <EmojiEventsIcon />;
       case 3:
-        return <StarIcon />;
+        return <EmojiEventsIcon />;
       default:
         return null;
     }
@@ -127,28 +202,85 @@ export const StartupDetails: React.FC = () => {
       }}
     >
       <Container maxWidth="lg" sx={{ py: 4 }}>
-        {/* Botão Voltar */}
-        <Box sx={{ mb: 4, display: 'flex', alignItems: 'center' }}>
-          <IconButton
-            onClick={() => navigate(-1)}
-            sx={{ 
-              color: '#FF6B6B',
-              '&:hover': { color: '#FF8E53' }
-            }}
-          >
-            <ArrowBackIcon />
-          </IconButton>
-          <Typography 
-            variant="h6" 
-            sx={{ 
-              ml: 1,
-              color: '#FF6B6B',
-              fontFamily: "'Inter', sans-serif",
-              fontWeight: 600
-            }}
-          >
-            Voltar
-          </Typography>
+        {/* Botão Voltar e Editar */}
+        <Box sx={{ mb: 4, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            <IconButton
+              onClick={() => navigate(-1)}
+              sx={{ 
+                color: '#FF6B6B',
+                '&:hover': { color: '#FF8E53' }
+              }}
+            >
+              <ArrowBackIcon />
+            </IconButton>
+            <Typography 
+              variant="h6" 
+              sx={{ 
+                ml: 1,
+                color: '#FF6B6B',
+                fontFamily: "'Inter', sans-serif",
+                fontWeight: 600
+              }}
+            >
+              Voltar
+            </Typography>
+          </Box>
+          
+          {isEditing ? (
+            <Box sx={{ display: 'flex', gap: 1 }}>
+              <Button
+                variant="contained"
+                onClick={handleSave}
+                startIcon={<SaveIcon />}
+                sx={{ 
+                  background: 'linear-gradient(135deg, #4CAF50 0%, #45a049 100%)',
+                  color: 'white',
+                  fontFamily: "'Inter', sans-serif",
+                  fontWeight: 600,
+                  '&:hover': {
+                    background: 'linear-gradient(135deg, #45a049 0%, #4CAF50 100%)',
+                  }
+                }}
+              >
+                Salvar
+              </Button>
+              <Button
+                variant="outlined"
+                onClick={handleCancel}
+                startIcon={<CancelIcon />}
+                sx={{ 
+                  color: '#FF6B6B',
+                  borderColor: '#FF6B6B',
+                  fontFamily: "'Inter', sans-serif",
+                  fontWeight: 600,
+                  '&:hover': {
+                    borderColor: '#FF8E53',
+                    color: '#FF8E53',
+                  }
+                }}
+              >
+                Cancelar
+              </Button>
+            </Box>
+          ) : (
+            <Button
+              variant="contained"
+              onClick={() => setIsEditing(true)}
+              startIcon={<EditIcon />}
+              sx={{ 
+                background: 'linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%)',
+                color: 'white',
+                fontFamily: "'Inter', sans-serif",
+                fontWeight: 600,
+                '&:hover': {
+                  background: 'linear-gradient(135deg, #FF8E53 0%, #FF6B6B 100%)',
+                }
+              }}
+            >
+              Editar
+            </Button>
+          )}
         </Box>
 
         {/* Cabeçalho da Startup */}
@@ -156,10 +288,46 @@ export const StartupDetails: React.FC = () => {
           <CardContent sx={{ p: 4 }}>
             <Grid container spacing={3}>
               <Grid item xs={12} md={8}>
-                <Typography variant="h3" sx={{ color: '#FF6B6B', fontWeight: 900 }}>{startup.name}</Typography>
-                <Typography variant="h6" sx={{ fontStyle: 'italic', color: 'text.secondary' }}>
-                  "{startup.slogan}"
-                </Typography>
+                {isEditing ? (
+                  <TextField
+                    fullWidth
+                    value={editedName}
+                    onChange={(e) => setEditedName(e.target.value)}
+                    sx={{ 
+                      mb: 2,
+                      '& .MuiInputBase-input': {
+                        fontFamily: "'Inter', sans-serif",
+                        fontWeight: 900,
+                        fontSize: '2rem',
+                        color: '#FF6B6B'
+                      }
+                    }}
+                  />
+                ) : (
+                  <Typography variant="h3" sx={{ color: '#FF6B6B', fontWeight: 900 }}>
+                    {startup.name}
+                  </Typography>
+                )}
+                
+                {isEditing ? (
+                  <TextField
+                    fullWidth
+                    value={editedSlogan}
+                    onChange={(e) => setEditedSlogan(e.target.value)}
+                    sx={{ 
+                      '& .MuiInputBase-input': {
+                        fontFamily: "'Inter', sans-serif",
+                        fontStyle: 'italic',
+                        color: 'text.secondary'
+                      }
+                    }}
+                  />
+                ) : (
+                  <Typography variant="h6" sx={{ fontStyle: 'italic', color: 'text.secondary' }}>
+                    "{startup.slogan}"
+                  </Typography>
+                )}
+
                 <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mt: 2 }}>
                   <Chip icon={<RocketLaunchIcon />} label={`${startup.stats.pitches} Pitches`} />
                   <Chip icon={<BugReportIcon />} label={`${startup.stats.bugs} Bugs`} />
@@ -190,9 +358,25 @@ export const StartupDetails: React.FC = () => {
               </Grid>
               <Grid item xs={12}>
                 <Typography variant="body1" color="text.secondary">Descrição</Typography>
-                <Typography variant="body2">
-                  {startup.description || "Nenhuma descrição disponível."}
-                </Typography>
+                {isEditing ? (
+                  <TextField
+                    fullWidth
+                    multiline
+                    rows={4}
+                    value={editedDescription}
+                    onChange={(e) => setEditedDescription(e.target.value)}
+                    sx={{ 
+                      mt: 1,
+                      '& .MuiInputBase-input': {
+                        fontFamily: "'Inter', sans-serif"
+                      }
+                    }}
+                  />
+                ) : (
+                  <Typography variant="body2">
+                    {startup.description || "Nenhuma descrição disponível."}
+                  </Typography>
+                )}
               </Grid>
             </Grid>
           </CardContent>
@@ -215,7 +399,10 @@ export const StartupDetails: React.FC = () => {
                         p: 3,
                         borderRadius: 2,
                         backgroundColor: 'rgba(255, 107, 107, 0.04)',
-                        border: `2px solid ${getPositionColor(entry.finalPosition)}`,
+                        border: '2px solid',
+                        borderColor: entry.finalPosition === 1 ? '#FFD700' :
+                                   entry.finalPosition === 2 ? '#C0C0C0' :
+                                   entry.finalPosition === 3 ? '#CD7F32' : '#FF6B6B',
                         position: 'relative'
                       }}
                     >
@@ -228,14 +415,26 @@ export const StartupDetails: React.FC = () => {
                           px: 2,
                           py: 0.5,
                           borderRadius: 1,
-                          border: `2px solid ${getPositionColor(entry.finalPosition)}`,
+                          border: '2px solid',
+                          borderColor: entry.finalPosition === 1 ? '#FFD700' :
+                                     entry.finalPosition === 2 ? '#C0C0C0' :
+                                     entry.finalPosition === 3 ? '#CD7F32' : '#FF6B6B',
                           display: 'flex',
                           alignItems: 'center',
                           gap: 1
                         }}
                       >
-                        {getPositionIcon(entry.finalPosition)}
-                        <Typography sx={{ color: getPositionColor(entry.finalPosition), fontWeight: 700 }}>
+                        <EmojiEventsIcon sx={{ 
+                          color: entry.finalPosition === 1 ? '#FFD700' :
+                                 entry.finalPosition === 2 ? '#C0C0C0' :
+                                 entry.finalPosition === 3 ? '#CD7F32' : '#FF6B6B'
+                        }} />
+                        <Typography sx={{ 
+                          color: entry.finalPosition === 1 ? '#FFD700' :
+                                 entry.finalPosition === 2 ? '#C0C0C0' :
+                                 entry.finalPosition === 3 ? '#CD7F32' : '#FF6B6B',
+                          fontWeight: 700 
+                        }}>
                           Edição #{entry.tournamentId.slice(0, 5)}
                         </Typography>
                       </Box>

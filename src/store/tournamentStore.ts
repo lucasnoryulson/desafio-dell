@@ -20,7 +20,8 @@ interface TournamentState {
   addEvent: (battleId: string, startupId: string, eventType: EventType) => void;
   getCurrentBattles: () => Battle[];
   getStartupById: (id: string) => Startup | undefined;
-  resetTournament: () => void; // 👈 aqui
+  resetTournament: () => void; 
+  updateStartup: (updatedStartup: Startup) => void;
 }
 
 
@@ -36,6 +37,20 @@ const EventPoints: Record<EventType, number> = {
 };
 
 export const useTournamentStore = create<TournamentState>((set, get) => ({
+  updateStartup: (updatedStartup) => {
+    const currentTournament = get().tournament;
+    if (!currentTournament) return;
+
+    set({
+      tournament: {
+        ...currentTournament,
+        startups: currentTournament.startups.map(s =>
+          s.id === updatedStartup.id ? { ...updatedStartup } : s
+        ),
+      }
+    });
+  },
+
   resetTournament: () => set({ tournament: null }),
 
   tournament: null,

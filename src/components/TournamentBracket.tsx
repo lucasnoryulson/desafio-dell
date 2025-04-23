@@ -89,82 +89,91 @@ export const TournamentBracket: React.FC = () => {
     </Paper>
   );
 
-  const renderBattleCard = (battle: Battle) => (
-    <Paper
-      elevation={3}
-      sx={{
-        p: isFourStartups ? 3 : 2,
-        mb: 2,
-        backgroundColor: 'white',
-        borderRadius: 2,
-        width: '100%',
-        maxWidth: isFourStartups ? '400px' : '300px',
-        transition: 'all 0.3s ease',
-        '&:hover': {
-          boxShadow: '0 8px 24px rgba(0,0,0,0.15)',
-        },
-      }}
-    >
-      <Box sx={{ mb: 1 }}>
-        <Box sx={{ 
-          display: 'flex', 
-          justifyContent: 'space-between', 
-          alignItems: 'center',
-          mb: 1
-        }}>
+  const renderBattleCard = (battle: Battle) => {
+    // ✅ Aqui é o lugar correto para lógica JS
+    const updatedStartup1 = tournament.startups.find(s => s.id === battle.startup1.id) || battle.startup1;
+    const updatedStartup2 = tournament.startups.find(s => s.id === battle.startup2.id) || battle.startup2;
+  
+    return (
+      <Paper
+        elevation={3}
+        sx={{
+          p: isFourStartups ? 3 : 2,
+          mb: 2,
+          backgroundColor: 'white',
+          borderRadius: 2,
+          width: '100%',
+          maxWidth: isFourStartups ? '400px' : '300px',
+          transition: 'all 0.3s ease',
+          '&:hover': {
+            boxShadow: '0 8px 24px rgba(0,0,0,0.15)',
+          },
+        }}
+      >
+        <Box sx={{ mb: 1 }}>
+          <Box sx={{ 
+            display: 'flex', 
+            justifyContent: 'space-between', 
+            alignItems: 'center',
+            mb: 1
+          }}>
+            <Typography 
+              variant={isFourStartups ? "h6" : "subtitle2"} 
+              color="#FF6B6B" 
+              sx={{ 
+                fontWeight: 900,
+                fontFamily: "'Inter', sans-serif"
+              }}
+            >
+              {getRoundName(battle.round)}
+            </Typography>
+            {!battle.isCompleted && (
+              <Button
+                size={isFourStartups ? "medium" : "small"}
+                variant="contained"
+                sx={{ 
+                  background: 'linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%)',
+                  color: 'white',
+                  boxShadow: '0 3px 5px 2px rgba(255, 107, 107, .3)',
+                  '&:hover': {
+                    background: 'linear-gradient(135deg, #FF8E53 0%, #FF6B6B 100%)',
+                  },
+                  fontFamily: "'Inter', sans-serif",
+                  fontWeight: 600,
+                  textTransform: 'none'
+                }}
+                onClick={() => handleBattleClick(battle.id)}
+              >
+                Avaliar
+              </Button>
+            )}
+          </Box>
+  
+          <Box onClick={() => battle.isCompleted ? null : handleBattleClick(battle.id)}>
+            {renderStartupCard(updatedStartup1, updatedStartup1.score, battle.winner === updatedStartup1.id)}
+            {renderStartupCard(updatedStartup2, updatedStartup2.score, battle.winner === updatedStartup2.id)}
+          </Box>
+        </Box>
+  
+        {battle.isCompleted && battle.winner && (
           <Typography 
-            variant={isFourStartups ? "h6" : "subtitle2"} 
-            color="#FF6B6B" 
+            variant={isFourStartups ? "body1" : "caption"}
             sx={{ 
-              fontWeight: 900,
+              display: 'flex', 
+              alignItems: 'center', 
+              color: '#4CAF50',
+              fontWeight: 600,
               fontFamily: "'Inter', sans-serif"
             }}
           >
-            {getRoundName(battle.round)}
+            <EmojiEventsIcon sx={{ fontSize: isFourStartups ? 20 : 16, mr: 0.5 }} />
+            Vencedor: {tournament.startups.find(s => s.id === battle.winner)?.name}
           </Typography>
-          {!battle.isCompleted && (
-            <Button
-              size={isFourStartups ? "medium" : "small"}
-              variant="contained"
-              sx={{ 
-                background: 'linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%)',
-                color: 'white',
-                boxShadow: '0 3px 5px 2px rgba(255, 107, 107, .3)',
-                '&:hover': {
-                  background: 'linear-gradient(135deg, #FF8E53 0%, #FF6B6B 100%)',
-                },
-                fontFamily: "'Inter', sans-serif",
-                fontWeight: 600,
-                textTransform: 'none'
-              }}
-              onClick={() => handleBattleClick(battle.id)}
-            >
-              Avaliar
-            </Button>
-          )}
-        </Box>
-        <Box onClick={() => battle.isCompleted ? null : handleBattleClick(battle.id)}>
-          {renderStartupCard(battle.startup1, battle.startup1.score, battle.winner === battle.startup1.id)}
-          {renderStartupCard(battle.startup2, battle.startup2.score, battle.winner === battle.startup2.id)}
-        </Box>
-      </Box>
-      {battle.isCompleted && battle.winner && (
-        <Typography 
-          variant={isFourStartups ? "body1" : "caption"}
-          sx={{ 
-            display: 'flex', 
-            alignItems: 'center', 
-            color: '#4CAF50',
-            fontWeight: 600,
-            fontFamily: "'Inter', sans-serif"
-          }}
-        >
-          <EmojiEventsIcon sx={{ fontSize: isFourStartups ? 20 : 16, mr: 0.5 }} />
-          Vencedor: {tournament.startups.find(s => s.id === battle.winner)?.name}
-        </Typography>
-      )}
-    </Paper>
-  );
+        )}
+      </Paper>
+    );
+  };
+  
 
   return (
     <Box

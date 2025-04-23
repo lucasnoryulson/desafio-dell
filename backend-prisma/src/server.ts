@@ -230,6 +230,38 @@ app.get('/api/startups/:id/participations', async (req, res) => {
   }
 });
 
+// server.ts
+
+app.put('/api/startups/:id', async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const { name, slogan, description } = req.body;
+
+  try {
+    const updated = await prisma.startup.update({
+      where: { id },
+      data: {
+        name,
+        slogan,
+        description,
+      },
+    });
+
+    // Busca a startup atualizada com participações (caso você precise disso no front)
+    const fullStartup = await prisma.startup.findUnique({
+      where: { id },
+      include: {
+        participations: true, // ou 'stats' se você tiver relacionamento assim
+      },
+    });
+
+    res.json(fullStartup); // ← envia startup com os mesmos campos que o GET
+  } catch (error) {
+    console.error("Erro ao atualizar startup:", error);
+    res.status(500).json({ error: "Erro ao atualizar startup" });
+  }
+});
+
+ 
 
 const PORT = process.env.PORT || 3001;
 
